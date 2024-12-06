@@ -35,8 +35,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseRouting();
 app.UseAuthorization();
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
@@ -95,9 +99,9 @@ void RegisterControllersWithServices()
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSettings:SigningKey"]!)),
-        ValidAudience = "ARM",
+        ValidAudience = configuration["JwtSettings:Audience"]!,
         ValidateAudience = true,
-        ValidIssuer = "ARM.Security.Service",
+        ValidIssuer = configuration["JwtSettings:Issuer"]!,
         ValidateIssuer = true,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
@@ -110,12 +114,13 @@ void RegisterControllersWithServices()
         AccessTokenLifetime = TimeSpan.Parse(configuration["JwtSettings:AccessTokenLifetime"]!),
         RefreshTokenMonthLifetime = int.Parse(configuration["JwtSettings:RefreshTokenMonthLifetime"]!),
         EncryptionKey = configuration["JwtSettings:EncryptionKey"]!,
-        Audience = "ARM",
-        Issuer = "ARM.Security.Service",
+        Audience = tokenValidationParameters.ValidAudience,
+        Issuer = tokenValidationParameters.ValidIssuer,
         TokenValidationParameters = tokenValidationParameters
     };
     builder.Services.AddSingleton(jwtSettings);
     
+    builder.Services.AddAuthorization();
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -127,7 +132,6 @@ void RegisterControllersWithServices()
         jwt.SaveToken = true;
         jwt.TokenValidationParameters = tokenValidationParameters;
     });
-    builder.Services.AddAuthorization();
     
     builder.Services.AddDbContext<AppDbContext>(opts =>
     {
@@ -176,7 +180,8 @@ void RunMigrations()
 
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    
+    //dbContext.Database.Migrate();
     
     logger.LogInformation("Миграции выполнены");
 }

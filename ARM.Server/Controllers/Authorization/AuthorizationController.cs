@@ -23,6 +23,7 @@ public class AuthorizationController : ControllerBase
         _userIdentityProvider = userIdentityProvider;
     }
     
+    [AllowAnonymous]
     [HttpPost]
     [Route("[action]")]
     public async Task<JsonResult> LogIn([FromBody] LogInCredentials credentials)
@@ -31,6 +32,7 @@ public class AuthorizationController : ControllerBase
         return new JsonResult(result);
     }
     
+    [AllowAnonymous]
     [HttpPost]
     [Route("[action]")]
     public async Task<JsonResult> SignUp([FromBody] SignUpCredentials credentials)
@@ -38,6 +40,7 @@ public class AuthorizationController : ControllerBase
         var result = await _sender.Send(new SignUpRequest(credentials, Request.Headers.UserAgent!));
         return new JsonResult(result);
     }
+    
     
     [HttpPost]
     [Route("[action]")]
@@ -50,7 +53,7 @@ public class AuthorizationController : ControllerBase
     [Authorize]
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> GetCurrentUserId([FromBody] TokensPair pair)
+    public async Task<JsonResult> GetCurrentUserId()
     {
         return new JsonResult(_userIdentityProvider.GetCurrentUserIdentity().UserId);
     }

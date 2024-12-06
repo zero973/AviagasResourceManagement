@@ -1,4 +1,5 @@
 ﻿using ARM.Core.Commands.Requests.Entities;
+using ARM.Core.Commands.Requests.Entities.ActualEntities;
 using ARM.Core.Enums;
 using ARM.Core.Extensions;
 using ARM.Core.Helpers;
@@ -48,17 +49,19 @@ public class AuthorizationService : IAuthorizationService
         return new Result<TokensPair>(true, token);
     }
 
-    public Task<Result<TokensPair>> SignUp(SignUpCredentials credentials, string deviceId)
+    public async Task<Result<TokensPair>> SignUp(SignUpCredentials credentials, string deviceId)
     {
         throw new NotImplementedException();
-        /*var newUser = new AppUser()
+        
+        var newUser = new AppUser()
         {
             Login = credentials.Login,
             PasswordHash = Encryptor.EncryptString(credentials.Password),
+            EmployeeId = Guid.Empty
         };
 
-        var token = await _jwtService.GenerateTokenForUserAsync(createdUser.Id, deviceId, cancellationToken);
-        return AuthorizationResponse.Success(token);*/
+        var token = await _jwtService.GenerateTokenForUser(newUser, deviceId);
+        return new Result<TokensPair>(true, token);
     }
 
     public async Task<Result<TokensPair>> Refresh(TokensPair pair, string deviceId)
@@ -66,7 +69,7 @@ public class AuthorizationService : IAuthorizationService
         var validatedToken = JwtUtils.GetPrincipalFromToken(pair.AccessToken, _tokenValidationParameters)!;
         var userId = Guid.Parse(validatedToken.Claims.Single(x => x.Type == "id").Value);
 
-        var userResult = await _sender.Send(new GetDataRequest<AppUser>(userId));
+        var userResult = await _sender.Send(new GetActualDataRequest<AppUser>(userId));
 
         if (!userResult.IsSuccess)
             return new Result<TokensPair>(userResult.Message);

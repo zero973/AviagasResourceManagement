@@ -35,7 +35,7 @@ public class JwtService : IJwtService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Name, user.Login),
             new(JwtRegisteredClaimNames.Email, user.Login),
-            new("id", user.Id.ToString()),
+            new("id", user.Id.ToString())
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -46,12 +46,12 @@ public class JwtService : IJwtService
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.Add(_jwtSettings.AccessTokenLifetime),
             SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature),
+                new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature)
         };
 
-        var encryptingKey = Encoding.ASCII.GetBytes(_jwtSettings.EncryptionKey!);
-        tokenDescriptor.EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptingKey),
-            JwtConstants.DirectKeyUseAlg, SecurityAlgorithms.Aes256CbcHmacSha512);
+        //var encryptingKey = Encoding.ASCII.GetBytes(_jwtSettings.EncryptionKey!);
+        //tokenDescriptor.EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptingKey),
+        //    JwtConstants.DirectKeyUseAlg, SecurityAlgorithms.Aes256CbcHmacSha512);
 
         var accessToken = tokenHandler.CreateToken(tokenDescriptor);
         var refreshToken = new RefreshToken

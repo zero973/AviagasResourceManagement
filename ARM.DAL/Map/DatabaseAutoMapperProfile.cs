@@ -34,5 +34,8 @@ public class DatabaseAutoMapperProfile : Profile
         
         CreateMap<Core.Models.Entities.WorkedTime, Models.Entities.WorkedTime>()
             .ReverseMap();
+        
+        CreateMap<Core.Models.Security.RefreshToken, Models.Security.RefreshToken>()
+            .ReverseMap();
     }
 }

@@ -1,21 +1,5 @@
 <template>
   <div>
-    <p>Get-fetch</p>
-    <button @click="getFetchData">Fetch Data</button>
-    <p>Ответ сервера: {{ responseAnswerGet }}</p>
-  </div>
-  <br>
-  <hr>
-  <br>
-  <div>
-    <p>Post-fetch</p>
-    <button @click="postFetchData">Fetch Data</button>
-    <p>Ответ сервера: {{ responseAnswerPost }}</p>
-  </div>
-  <br>
-  <hr>
-  <br>
-  <div>
     <p>Auth-fetch</p>
     <p>Логин:</p>
     <input v-model="login" type="text" placeholder="Логин" />
@@ -28,9 +12,9 @@
   <hr>
   <br>
   <div>
-    <p>Privacy-fetch</p>
-    <button @click="privacyFetch">Fetch Data</button>
-    <p>Ответ сервера: {{ responseAnswerPrivacy }}</p>
+    <p>Get current user Id</p>
+    <button @click="getCurrentUserId">Get Id</button>
+    <p>Ответ сервера: {{ responseGetCurrentUserId }}</p>
   </div>
   <br>
   <hr>
@@ -38,7 +22,7 @@
   <div>
     <p>Test id in array fetch</p>
     <button @click="arrayFetch">Fetch Data</button>
-    <p>Ответ сервера: {{ responseAnswerPrivacy }}</p>
+    <p>Ответ сервера: {{ responseAnswerArray }}</p>
   </div>
 </template>
 
@@ -51,67 +35,42 @@
   import ComplexFilter from "@/ComplexFilter.js";
   import BaseListParams from "@/BaseListParams.js";
 
-  const responseAnswerGet = ref('');
-  const responseAnswerPost = ref('');
   const login = ref('');
   const password = ref('');
   const responseAnswerOnAuth = ref('');
-  const responseAnswerPrivacy = ref('');
+  const responseGetCurrentUserId = ref('');
   const responseAnswerArray = ref('');
-  const tokenPair = new TokensPair('', '');
 
-  const getFetchData = () => {
-    const headers = { "Content-Type": "application/json" };
-    fetch("/api/Home/HelloWorldGet", { headers })
-      .then(response => response.json())
-      .then(data => (responseAnswerGet.value = data));
-  }
+  const loginFetch = async () => {
 
-  const postFetchData = () => {
-    let user = {
-      name: 'John',
-      surname: 'Smith'
-    };
-    const headers = { "Content-Type": "application/json" };
-    fetch("/api/Home/HelloWorldPost",
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(user)
-      })
-      .then(response => response.json())
-      .then(data => (responseAnswerPost.value = data));
-  }
-
-  const loginFetch = () => {
     const credentials = new LoginModel(login.value, password.value);
-    fetch("/api/Home/LogIn",
-      {
-        method: 'POST',
-        body: JSON.stringify({ credentials })
+
+    await axios.post('/api/Authorization/LogIn', credentials)
+      .then(x => {
+        responseAnswerOnAuth.value = x.data.data;
+        sessionStorage.setItem('AccessToken', x.data.data.accessToken);
+        sessionStorage.setItem('RefreshToken', x.data.data.refreshToken);
       })
-      .then(response => response.json())
-      .then(data =>
-      {
-        responseAnswerOnAuth.value = data;
-        tokenPair.AccessToken = data.AccessToken;
-        tokenPair.RefreshToken = data.RefreshToken;
-      });
+      .catch(x => console.error(x));
+
   }
 
-  const privacyFetch = () => {
-    fetch("/api/Home/GetPrivacyData",
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Bearer': tokenPair.AccessToken
-        }
+  const getCurrentUserId = async () => {
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
+    };
+
+    await axios.post('/api/Authorization/GetCurrentUserId', {},
+    {
+      headers: headers
+    })
+      .then(x => {
+        responseGetCurrentUserId.value = x.data;
       })
-      .then(response => response.json())
-      .then(data => (responseAnswerPrivacy.value = data));
+      .catch(x => console.error(x));
+
   }
 
   const arrayFetch = async () => {
@@ -124,8 +83,24 @@
       params.Filters.push(filter);
 
       params.Filters = JSON.stringify(params.Filters);
-      const {data} = await axios.get('/api/Cabinet/GetAll', {params});
-      responseAnswerArray.value = data.data;
+
+      axios({
+        method: 'get',
+        url: '/api/Cabinet/GetAll',
+        params: params,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
+        }
+      })
+        .then(response => {
+          responseAnswerArray.value = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+
+      responseAnswerArray.value = data;
     } catch (err) {
       console.error(err);
     }
