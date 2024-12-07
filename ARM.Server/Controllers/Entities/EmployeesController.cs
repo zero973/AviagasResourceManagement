@@ -9,7 +9,7 @@ namespace ARM.WebApi.Controllers.Entities;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class EmployeeController : BaseActualEntityController<Employee>
+public class EmployeeController : BaseActualEntityController<EmployeeAccount>
 {
     public EmployeeController(ISender sender) : base(sender)
     {

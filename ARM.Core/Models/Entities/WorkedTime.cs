@@ -9,7 +9,7 @@ public class WorkedTime : BaseActualEntity
     /// <summary>
     /// Пользователь
     /// </summary>
-    public required Guid UserId { get; set; }
+    public required Guid EmployeeId { get; set; }
     
     /// <summary>
     /// Задача, над которой работал сотрудник

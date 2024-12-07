@@ -34,9 +34,9 @@ public class AuthorizationService : IAuthorizationService
         var passwordHash = Encryptor.EncryptString(credentials.Password);
         var prms = new BaseListParams()
             .WithActualFilter()
-            .WithFilter(nameof(AppUser.Login), ComplexFilterOperators.Equals, credentials.Login)
-            .WithFilter(nameof(AppUser.PasswordHash), ComplexFilterOperators.Equals, passwordHash);
-        var userResult = await _sender.Send(new GetAllDataRequest<AppUser>(prms));
+            .WithFilter(nameof(EmployeeAccount.Login), ComplexFilterOperators.Equals, credentials.Login)
+            .WithFilter(nameof(EmployeeAccount.PasswordHash), ComplexFilterOperators.Equals, passwordHash);
+        var userResult = await _sender.Send(new GetAllDataRequest<EmployeeAccount>(prms));
 
         if (!userResult.Data.Any())
             return new Result<TokensPair>("Пользователь с таким логином и паролем не найден");
@@ -53,7 +53,7 @@ public class AuthorizationService : IAuthorizationService
     {
         throw new NotImplementedException();
         
-        var newUser = new AppUser()
+        var newUser = new EmployeeAccount()
         {
             Login = credentials.Login,
             PasswordHash = Encryptor.EncryptString(credentials.Password),
@@ -69,7 +69,7 @@ public class AuthorizationService : IAuthorizationService
         var validatedToken = JwtUtils.GetPrincipalFromToken(pair.AccessToken, _tokenValidationParameters)!;
         var userId = Guid.Parse(validatedToken.Claims.Single(x => x.Type == "id").Value);
 
-        var userResult = await _sender.Send(new GetActualDataRequest<AppUser>(userId));
+        var userResult = await _sender.Send(new GetActualDataRequest<EmployeeAccount>(userId));
 
         if (!userResult.IsSuccess)
             return new Result<TokensPair>(userResult.Message);

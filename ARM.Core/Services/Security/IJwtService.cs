@@ -12,6 +12,6 @@ public interface IJwtService
     /// <summary>
     /// Сгенерировать пару токенов <see cref="TokensPair"/> для пользователя <paramref name="user"/>
     /// </summary>
-    Task<TokensPair> GenerateTokenForUser(AppUser user, string deviceId);
+    Task<TokensPair> GenerateTokenForUser(EmployeeAccount user, string deviceId);
     
 }

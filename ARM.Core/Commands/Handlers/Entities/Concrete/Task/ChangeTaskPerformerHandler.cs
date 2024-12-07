@@ -6,7 +6,7 @@ using ARM.Core.Repositories;
 using FluentValidation;
 using MediatR;
 
-namespace ARM.Core.Commands.Handlers.Entities.Concrete;
+namespace ARM.Core.Commands.Handlers.Entities.Concrete.Task;
 
 /// <summary>
 /// Хэндлер для смены текущего исполнителя задачи

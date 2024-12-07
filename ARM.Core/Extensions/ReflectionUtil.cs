@@ -10,7 +10,7 @@ public static class ReflectionUtil
 {
     public static PropertyInfo? GetPropertyForExpression(Type type, string name)
     {
-        PropertyInfo property = type.GetProperties().FirstOrDefault(x => x.Name.ToLower().Equals(name.ToLower())); //type.GetProperty(name, BindingFlags.IgnoreCase)
+        PropertyInfo property = type.GetProperties().FirstOrDefault(x => x.Name.ToLower().Equals(name.ToLower()));
         if (property == null)
             return null;
 

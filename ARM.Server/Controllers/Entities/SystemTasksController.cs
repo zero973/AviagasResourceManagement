@@ -11,10 +11,10 @@ namespace ARM.WebApi.Controllers.Entities;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class SystemTaskController : BaseActualEntityController<SystemTask>
+public class SystemTasksController : BaseActualEntityController<SystemTask>
 {
     
-    public SystemTaskController(ISender sender) : base(sender)
+    public SystemTasksController(ISender sender) : base(sender)
     {
         
     }
@@ -63,6 +63,18 @@ public class SystemTaskController : BaseActualEntityController<SystemTask>
     public async Task<JsonResult> RemoveLinkedEmployee([FromBody] TaskEmployee employee)
     {
         return new JsonResult(await _sender.Send(new DeleteDataRequest<TaskEmployee>(employee)));
+    }
+    
+    /// <summary>
+    /// Получение статистики по затратам на задачи в заданном месяце <paramref name="month"/>.
+    /// </summary>
+    /// <param name="month"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<JsonResult> GetTasksStatistics([FromQuery] DateTime month)
+    {
+        return new JsonResult(await _sender.Send(new GetTasksStatistics(month)));
     }
     
 }

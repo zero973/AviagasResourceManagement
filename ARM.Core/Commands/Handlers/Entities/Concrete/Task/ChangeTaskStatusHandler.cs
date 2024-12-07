@@ -1,4 +1,5 @@
 ﻿using ARM.Core.Commands.Requests.Entities.Concrete;
+using ARM.Core.Enums;
 using ARM.Core.Helpers;
 using ARM.Core.Models.Entities;
 using ARM.Core.Models.UI;
@@ -6,7 +7,7 @@ using ARM.Core.Repositories;
 using FluentValidation;
 using MediatR;
 
-namespace ARM.Core.Commands.Handlers.Entities.Concrete;
+namespace ARM.Core.Commands.Handlers.Entities.Concrete.Task;
 
 /// <summary>
 /// Хэндлер для смены статуса задачи и автоматической смены нужного исполнителя в зависимости от новго статуса.
@@ -31,7 +32,15 @@ public class ChangeTaskStatusHandler : IRequestHandler<ChangeTaskStatus, Result<
             return new Result<SystemTask>(false, null, validationResult.Message);
 
         var task = (await _repository.Get(request.TaskId)).Data;
+        
+        // проставляем новый статус
         task.Status = request.NewStatus;
+        
+        // меняем исполнителя в зависимости от нового статуса
+        if (task.Status == TaskStatuses.AssemblingComponents)
+            task.CurrentPerformerId = task.Employees.Single(x => x.Role == UsersRoles.Storage).Id;
+        else if (task.Status == TaskStatuses.Installation)
+            task.CurrentPerformerId = task.Employees.Single(x => x.Role == UsersRoles.Engineer).Id;
         
         return await _repository.Update(task);
     }

@@ -11,9 +11,9 @@ public class WorkedTime : BaseActualEntity
     /// <summary>
     /// Пользователь
     /// </summary>
-    public AppUser User { get; set; }
+    public Employee Employee { get; set; }
     
-    public Guid UserId { get; set; }
+    public Guid EmployeeId { get; set; }
     
     /// <summary>
     /// Задача, в которй был оставлен коментарий
@@ -46,9 +46,9 @@ public class WorkedTime : BaseActualEntity
         
     }
 
-    public WorkedTime(Guid userId, Guid taskId, DateTime date, int hours, bool isOverwork)
+    public WorkedTime(Guid employeeId, Guid taskId, DateTime date, int hours, bool isOverwork)
     {
-        UserId = userId;
+        EmployeeId = employeeId;
         TaskId = taskId;
         Date = date;
         Hours = hours;

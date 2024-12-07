@@ -2,9 +2,11 @@
 using ARM.Core.Models.Entities;
 using ARM.Core.Models.UI;
 using ARM.DAL.ApplicationContexts;
+using ARM.DAL.Models.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Employee = ARM.Core.Models.Entities.Employee;
 using EmployeeSalary = ARM.DAL.Models.Entities.EmployeeSalary;
 
 namespace ARM.DAL.Repositories;
@@ -12,7 +14,7 @@ namespace ARM.DAL.Repositories;
 /// <summary>
 /// Репозиторий для работы с сотрудниками
 /// </summary>
-public class EmployeesRepository : BaseDbActualEntitiesRepository<Employee, Models.Entities.Employee>
+public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccount, Models.Entities.Employee>
 {
     
     public EmployeesRepository(AppDbContext context, IMapper mapper, ILogger<EmployeesRepository> logger)
@@ -21,81 +23,110 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<Employee, Mode
 
     }
 
-    public override async Task<Result<Employee>> Get(Guid id)
+    public override async Task<Result<EmployeeAccount>> Get(Guid id)
     {
         try
         {
-            var result = await _context.Employees
+            var employee = await _context.Employees
                 .Include(x => x.Salary)
                 .SingleAsync(x => x.Id == id);
-            return new Result<Employee>(true, _mapper.Map<Employee>(result));
+
+            var user = await _context.Users
+                .SingleAsync(x => x.Id == id);
+
+            var result = new EmployeeAccount(id, user.Login, user.Role, 
+                $"{employee.LastName} {employee.FirstName} {employee.Patronymic}", employee.Birthday, employee.Passport, 
+                employee.Salary!.SalaryForOneHour, employee.PhotoUrl)
+                { 
+                    CreateDate = employee.CreateDate, 
+                    CreatedUserId = employee.CreatedUserId,
+                    UpdateDate = employee.UpdateDate, 
+                    UpdatedUserId = employee.UpdatedUserId,
+                    DeleteDate = employee.DeleteDate, 
+                    DeletedUserId = employee.DeletedUserId
+                };
+            
+            return new Result<EmployeeAccount>(true, result);
         }
         catch (Exception ex) 
         {
             _logger.LogError(ex, "Ошибка при получении объекта по Id");
-            return new Result<Employee>("Произошла ошибка при попытке получить объект по Id");
+            return new Result<EmployeeAccount>("Произошла ошибка при попытке получить объект по Id");
         }
     }
 
-    public override async Task<Result<List<Employee>>> GetAll(BaseListParams baseParams)
+    public override async Task<Result<List<EmployeeAccount>>> GetAll(BaseListParams baseParams)
     {
-        var result = _context.Employees
+        var employees = _context.Employees
             .Include(x => x.Salary)
             .AsQueryable();
 
         try
         {
             if (baseParams.Filters?.Any() ?? false)
-                result = result.WithFilters(baseParams.Filters);
-            result = result.WithOrdering(baseParams).WithPagination(baseParams);
+                employees = employees.WithFilters(baseParams.Filters);
+            employees = employees.WithOrdering(baseParams).WithPagination(baseParams);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при применении фильтров, сортировки и пагинации");
-            return new Result<List<Employee>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
+            return new Result<List<EmployeeAccount>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
         }
 
         try
         {
-            return new Result<List<Employee>>(true, await _mapper.ProjectTo<Employee>(result).ToListAsync());
+            var result = employees.Join(_context.Users, e => e.Id, u => u.Id, 
+                (e, u) => new EmployeeAccount(e.Id, u.Login, u.Role, $"{e.LastName} {e.FirstName} {e.Patronymic}", 
+                    e.Birthday, e.Passport, e.Salary!.SalaryForOneHour, e.PhotoUrl)
+                { 
+                    CreateDate = e.CreateDate, 
+                    CreatedUserId = e.CreatedUserId,
+                    UpdateDate = e.UpdateDate, 
+                    UpdatedUserId = e.UpdatedUserId,
+                    DeleteDate = e.DeleteDate, 
+                    DeletedUserId = e.DeletedUserId
+                });
+            
+            return new Result<List<EmployeeAccount>>(true, await result.ToListAsync());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при загрузке данных");
-            return new Result<List<Employee>>("Произошла ошибка при загрузке данных");
+            return new Result<List<EmployeeAccount>>("Произошла ошибка при загрузке данных");
         }
     }
 
-    public override async Task<Result<Employee>> Add(Employee newEntity)
+    public override async Task<Result<EmployeeAccount>> Add(EmployeeAccount newEntity)
     {
         var entityForSave = _mapper.Map<Models.Entities.Employee>(newEntity);
-        var salary = new EmployeeSalary(newEntity.Id, 
-            newEntity.SalaryForOneHour, DateTime.Now, DateTime.MaxValue);
+        var salary = new EmployeeSalary(newEntity.Id, newEntity.SalaryForOneHour, DateTime.Now, DateTime.MaxValue);
 
         try
         {
             var savedEntity = await _context.Employees.AddAsync(entityForSave);
             var savedSalary = await AddSalary(salary, newEntity);
+            await _context.Users.AddAsync(GetAppUser(newEntity));
 
             await SaveChanges();
             
             savedEntity.Entity.Salary = savedSalary;
             
-            return new Result<Employee>(true, _mapper.Map<Employee>(savedEntity.Entity));
+            return new Result<EmployeeAccount>(true, _mapper.Map<EmployeeAccount>(savedEntity.Entity));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при добавлении сущности");
-            return new Result<Employee>("Произошла ошибка при добавлении сущности");
+            return new Result<EmployeeAccount>("Произошла ошибка при добавлении сущности");
         }
     }
 
-    public override async Task<Result<Employee>> Update(Employee entity)
+    public override async Task<Result<EmployeeAccount>> Update(EmployeeAccount entity)
     {
         try
         {
             var entityForSave = _mapper.Map<Models.Entities.Employee>(entity);
             _context.Employees.Update(entityForSave);
+            _context.Users.Update(GetAppUser(entity));
             
             var newSalary = new EmployeeSalary(entity.Id, 
                 entity.SalaryForOneHour, DateTime.Now, DateTime.MaxValue);
@@ -113,16 +144,16 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<Employee, Mode
             
             entityForSave.Salary = curSalary;
             
-            return new Result<Employee>(true, _mapper.Map<Employee>(entityForSave));
+            return new Result<EmployeeAccount>(true, _mapper.Map<EmployeeAccount>(entityForSave));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при изменении сущности");
-            return new Result<Employee>("Произошла ошибка при изменении сущности");
+            return new Result<EmployeeAccount>("Произошла ошибка при изменении сущности");
         }
     }
 
-    public override async Task<Result<Employee>> Remove(Employee entity)
+    public override async Task<Result<EmployeeAccount>> Remove(EmployeeAccount entity)
     {
         try
         {
@@ -132,29 +163,34 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<Employee, Mode
                 .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsActual, _ => false)
                     .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
                     .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
+
+            await _context.Users.Where(x => x.Id == entity.Id)
+                .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsActual, _ => false)
+                    .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
+                    .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
             
             var curSalary = await _context.EmployeeSalaries
                 .SingleAsync(x => x.EmployeeId == entity.Id && x.IsActual);
 
             await DeleteSalary(curSalary, entity);
 
-            return new Result<Employee>(true, entity);
+            return new Result<EmployeeAccount>(true, entity);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<Employee>("Произошла ошибка при удалении сущности");
+            return new Result<EmployeeAccount>("Произошла ошибка при удалении сущности");
         }
     }
 
-    private async Task<EmployeeSalary> AddSalary(EmployeeSalary salary, Employee employee)
+    private async Task<EmployeeSalary> AddSalary(EmployeeSalary salary, EmployeeAccount employee)
     {
         salary.CreatedUserId = employee.CreatedUserId;
         
         return (await _context.EmployeeSalaries.AddAsync(salary)).Entity;
     }
 
-    private async Task DeleteSalary(EmployeeSalary salary, Employee employee)
+    private async Task DeleteSalary(EmployeeSalary salary, EmployeeAccount employee)
     {
         salary.IsActual = false;
         salary.End = DateTime.Now;
@@ -171,5 +207,17 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<Employee, Mode
                 .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
                 .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
     }
-    
+
+    private AppUser GetAppUser(EmployeeAccount user) 
+        => new AppUser(user.Login, user.PasswordHash, user.Role, user.Id) 
+        { 
+            Id = user.Id, 
+            CreateDate = user.CreateDate, 
+            CreatedUserId = user.CreatedUserId,
+            UpdateDate = user.UpdateDate, 
+            UpdatedUserId = user.UpdatedUserId,
+            DeleteDate = user.DeleteDate, 
+            DeletedUserId = user.DeletedUserId 
+        };
+
 }

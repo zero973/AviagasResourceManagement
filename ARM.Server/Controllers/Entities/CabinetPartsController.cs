@@ -9,9 +9,9 @@ namespace ARM.WebApi.Controllers.Entities;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class WorkedTimeController : BaseActualEntityController<WorkedTime>
+public class CabinetPartsController : BaseEntityController<CabinetPart>
 {
-    public WorkedTimeController(ISender sender) : base(sender)
+    public CabinetPartsController(ISender sender) : base(sender)
     {
         
     }

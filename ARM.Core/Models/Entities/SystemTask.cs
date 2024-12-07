@@ -31,7 +31,7 @@ public class SystemTask : BaseActualEntity
     /// <summary>
     /// Все сотрудники, которые принима(ют\ли) участие в задаче
     /// </summary>
-    public required List<Employee> Employees { get; set; }
+    public required List<EmployeeAccount> Employees { get; set; }
     
     /// <summary>
     /// Крайний срок 

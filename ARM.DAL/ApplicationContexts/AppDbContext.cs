@@ -1,8 +1,11 @@
-﻿using ARM.Core.Enums;
+﻿using System.Data;
+using ARM.Core.Enums;
 using ARM.Core.Helpers;
 using ARM.DAL.Models.Entities;
 using ARM.DAL.Models.Security;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 
 namespace ARM.DAL.ApplicationContexts;
@@ -147,12 +150,12 @@ public class AppDbContext : DbContext
 
         builder.Entity<Comment>(entity =>
         {
-            entity.HasIndex(e => new { e.UserId, e.TaskId })
+            entity.HasIndex(e => new { e.EmployeeId, e.TaskId })
                 .HasFilter(isActualFilter);
             
-            entity.HasOne(e => e.User)
+            entity.HasOne(e => e.Employee)
                 .WithMany(e => e.Comments)
-                .HasForeignKey(e => e.UserId)
+                .HasForeignKey(e => e.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             entity.HasOne(e => e.LinkedTask)
@@ -180,12 +183,12 @@ public class AppDbContext : DbContext
 
         builder.Entity<WorkedTime>(entity =>
         {
-            entity.HasIndex(e => new { e.UserId, e.TaskId })
+            entity.HasIndex(e => new { e.EmployeeId, e.TaskId })
                 .HasFilter(isActualFilter);
             
-            entity.HasOne(e => e.User)
+            entity.HasOne(e => e.Employee)
                 .WithMany(e => e.WorkedTimes)
-                .HasForeignKey(e => e.UserId)
+                .HasForeignKey(e => e.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             entity.HasOne(e => e.LinkedTask)
@@ -220,24 +223,29 @@ public class AppDbContext : DbContext
 
         optionsBuilder.UseSeeding((context, _) =>
         {
-            context.Set<Cabinet>().AddRange(new Cabinet("ВРУ", "Вводно-распределительное устройство"), 
-                new Cabinet("ИБП", "Источник бесперебойного питания"), 
-                new Cabinet("ЩУПТ", "Щит управления подготовки теплоносителя"), 
-                new Cabinet("ШВП", "Шкаф вторичных приборов"), 
-                new Cabinet("ЩПС", "Щит пожарной сигнализации"), 
-                new Cabinet("ЩР", "Щит распределительный"), 
-                new Cabinet("ПУБО", "Пульт управления боксом операторной"));
+            var cabinet1 = new Cabinet("ВРУ", "Вводно-распределительное устройство");
+            var cabinet2 = new Cabinet("ИБП", "Источник бесперебойного питания");
+            var cabinet3 = new Cabinet("ЩУПТ", "Щит управления подготовки теплоносителя");
+            var cabinet4 = new Cabinet("ШВП", "Шкаф вторичных приборов");
+            var cabinet5 = new Cabinet("ЩПС", "Щит пожарной сигнализации");
+            var cabinet6 = new Cabinet("ЩР", "Щит распределительный");
+            var cabinet7 = new Cabinet("ПУБО", "Пульт управления боксом операторной");
             
-            context.Set<CabinetPart>().AddRange(new CabinetPart("Выключатель автоматический", 1100), 
-                new CabinetPart("Блок питания", 20000), 
-                new CabinetPart("Информационная панель", 50000), 
-                new CabinetPart("Контроллер", 70000), 
-                new CabinetPart("Реле", 1300), 
-                new CabinetPart("Шина \"РЕ\"", 2400), 
-                new CabinetPart("Проходная клемма", 120));
+            context.Set<Cabinet>().AddRange(cabinet1, cabinet2, cabinet3, cabinet4, cabinet5, cabinet6, cabinet7);
+
+            var cabinetPart1 = new CabinetPart("Выключатель автоматический", 1100);
+            var cabinetPart2 = new CabinetPart("Блок питания", 20000);
+            var cabinetPart3 = new CabinetPart("Информационная панель", 50000);
+            var cabinetPart4 = new CabinetPart("Контроллер", 70000);
+            var cabinetPart5 = new CabinetPart("Реле", 1300);
+            var cabinetPart6 = new CabinetPart("Шина \"РЕ\"", 2400);
+            var cabinetPart7 = new CabinetPart("Проходная клемма", 120);
+            
+            context.Set<CabinetPart>().AddRange(cabinetPart1, cabinetPart2, cabinetPart3, cabinetPart4, cabinetPart5, 
+                cabinetPart6, cabinetPart7);
             
             // Админ
-            var employee1 = new Employee("Сиразетдинов", "Айрат", "Айратович", new DateTime(1972, 06, 03), "9014813631");
+            var admin = new Employee("Сиразетдинов", "Айрат", "Айратович", new DateTime(1972, 06, 03), "9014813631");
             // Инженеры
             var employee2 = new Employee("Михоношин", "Дмитрий", "Владимирович", new DateTime(1989, 7, 17), "9211487653");
             var employee3 = new Employee("Малакеев", "Сергей", "Владиславович", new DateTime(1978, 09, 28), "9223597656");
@@ -247,14 +255,15 @@ public class AppDbContext : DbContext
             var employee7 = new Employee("Сулейманов", "Вильдан", "Рустемович", new DateTime(2001, 01, 17), "9214969121");
             var employee8 = new Employee("Пчелинцев", "Александр", "Евгеньевич", new DateTime(1991, 06, 11), "9112913621");
             // Чертёжник
-            var employee9 = new Employee("Левкин", "Владимир", "Васильевич", new DateTime(1986, 04, 30), "9115933627");
+            var draftsman = new Employee("Левкин", "Владимир", "Васильевич", new DateTime(1986, 04, 30), "9115933627");
             // Склад
-            var employee10 = new Employee("Зайнуллина", "Вероника", "Олеговна", new DateTime(1990, 08, 22), "9135921628");
+            var storage = new Employee("Зайнуллина", "Вероника", "Олеговна", new DateTime(1990, 08, 22), "9135921628");
             
-            context.Set<Employee>().AddRange(employee1, employee2, employee3, employee4, employee5, employee6, 
-                employee7, employee8, employee9, employee10);
+            context.Set<Employee>().AddRange(admin, employee2, employee3, employee4, employee5, employee6, 
+                employee7, employee8, draftsman, storage);
 
-            context.Set<EmployeeSalary>().AddRange(new EmployeeSalary(employee1.Id, 500, new DateTime(2024, 1, 1), DateTime.MaxValue), 
+            context.Set<EmployeeSalary>().AddRange(
+                new EmployeeSalary(admin.Id, 500, new DateTime(2024, 1, 1), DateTime.MaxValue), 
                 new EmployeeSalary(employee2.Id, 415, new DateTime(2024, 1, 1), DateTime.MaxValue),
                 new EmployeeSalary(employee3.Id, 415, new DateTime(2024, 1, 1), DateTime.MaxValue),
                 new EmployeeSalary(employee4.Id, 415, new DateTime(2024, 1, 1), DateTime.MaxValue),
@@ -262,24 +271,58 @@ public class AppDbContext : DbContext
                 new EmployeeSalary(employee6.Id, 415, new DateTime(2024, 1, 1), DateTime.MaxValue),
                 new EmployeeSalary(employee7.Id, 415, new DateTime(2024, 1, 1), DateTime.MaxValue),
                 new EmployeeSalary(employee8.Id, 415, new DateTime(2024, 1, 1), DateTime.MaxValue),
-                new EmployeeSalary(employee9.Id, 400, new DateTime(2024, 1, 1), DateTime.MaxValue),
-                new EmployeeSalary(employee10.Id, 250, new DateTime(2024, 1, 1), DateTime.MaxValue));
-
-            var user1 = new AppUser("admin", Encryptor.EncryptString("admin"), UsersRoles.Admin, employee1.Id);
-            var user2 = new AppUser("engineer1", Encryptor.EncryptString("engineer1"), UsersRoles.Engineer, employee2.Id);
-            var user3 = new AppUser("engineer2", Encryptor.EncryptString("engineer2"), UsersRoles.Admin, employee3.Id);
-            var user4 = new AppUser("engineer3", Encryptor.EncryptString("engineer3"), UsersRoles.Admin, employee4.Id);
-            var user5 = new AppUser("engineer4", Encryptor.EncryptString("engineer4"), UsersRoles.Admin, employee5.Id);
-            var user6 = new AppUser("engineer5", Encryptor.EncryptString("engineer5"), UsersRoles.Admin, employee6.Id);
-            var user7 = new AppUser("engineer6", Encryptor.EncryptString("engineer6"), UsersRoles.Admin, employee7.Id);
-            var user8 = new AppUser("engineer7", Encryptor.EncryptString("engineer7"), UsersRoles.Admin, employee8.Id);
-            var user9 = new AppUser("draftsman", Encryptor.EncryptString("draftsman"), UsersRoles.Draftsman, employee9.Id);
-            var user10 = new AppUser("storage", Encryptor.EncryptString("storage"), UsersRoles.Storage, employee10.Id);
+                new EmployeeSalary(draftsman.Id, 400, new DateTime(2024, 1, 1), DateTime.MaxValue),
+                new EmployeeSalary(storage.Id, 250, new DateTime(2024, 1, 1), DateTime.MaxValue));
             
-            context.Set<AppUser>().AddRange(user1, user2, user3, user4, user5, user6, user7, user8, user9, user10);
+            context.Set<AppUser>().AddRange(
+                new AppUser("admin", Encryptor.EncryptString("admin"), UsersRoles.Admin, admin.Id), 
+                new AppUser("engineer1", Encryptor.EncryptString("engineer1"), UsersRoles.Engineer, employee2.Id), 
+                new AppUser("engineer2", Encryptor.EncryptString("engineer2"), UsersRoles.Admin, employee3.Id), 
+                new AppUser("engineer3", Encryptor.EncryptString("engineer3"), UsersRoles.Admin, employee4.Id), 
+                new AppUser("engineer4", Encryptor.EncryptString("engineer4"), UsersRoles.Admin, employee5.Id), 
+                new AppUser("engineer5", Encryptor.EncryptString("engineer5"), UsersRoles.Admin, employee6.Id), 
+                new AppUser("engineer6", Encryptor.EncryptString("engineer6"), UsersRoles.Admin, employee7.Id), 
+                new AppUser("engineer7", Encryptor.EncryptString("engineer7"), UsersRoles.Admin, employee8.Id), 
+                new AppUser("draftsman", Encryptor.EncryptString("draftsman"), UsersRoles.Draftsman, draftsman.Id), 
+                new AppUser("storage", Encryptor.EncryptString("storage"), UsersRoles.Storage, storage.Id));
 
+            var task1 = new SystemTask("Тестовая задача", cabinet1.Id, TaskStatuses.Installation, 
+                employee7.Id, new DateTime(2024, 12, 30), 50) { CreateDate = new DateTime(2024, 11, 15) };
+
+            context.Set<SystemTask>().AddRange(task1);
+            
+            context.Set<CabinetPartCounts>().AddRange(
+                new CabinetPartCounts(cabinetPart1.Id, task1.Id, 5), 
+                new CabinetPartCounts(cabinetPart2.Id, task1.Id, 3));
+
+            context.Set<TaskEmployee>().AddRange(
+                new TaskEmployee(draftsman.Id, task1.Id), 
+                new TaskEmployee(storage.Id, task1.Id), 
+                new TaskEmployee(employee7.Id, task1.Id));
+
+            context.Set<WorkedTime>().AddRange(
+                new WorkedTime(employee7.Id, task1.Id, new DateTime(2024, 11, 26), 8, false),
+                new WorkedTime(employee7.Id, task1.Id, new DateTime(2024, 11, 27), 8, false),
+                new WorkedTime(employee7.Id, task1.Id, new DateTime(2024, 11, 28), 8, false));
+
+            context.Set<Comment>().AddRange(
+                new Comment(draftsman.Id, task1.Id, "Ссылка на чертёж: https....."), 
+                new Comment(storage.Id, task1.Id, "Не выдала деталь какую-то. Потом добавлю..."));
+            
             context.SaveChanges();
         });
+    }
+    
+    public (IDbConnection connection, IDbTransaction? transaction) GetConnection()
+    {
+        var connection = Database.GetDbConnection();
+        return (connection, Database.CurrentTransaction?.GetDbTransaction());
+    }
+
+    public async Task<string> GetDatabaseVersion()
+    {
+        var (connection, transaction) = GetConnection();
+        return (await connection.ExecuteScalarAsync<string>("SELECT version()"))!;
     }
     
 }

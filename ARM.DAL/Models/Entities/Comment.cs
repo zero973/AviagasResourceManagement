@@ -11,12 +11,12 @@ public class Comment : BaseActualEntity
     /// <summary>
     /// Автор комментария
     /// </summary>
-    public AppUser User { get; set; }
+    public Employee Employee { get; set; }
     
     /// <summary>
     /// Автор комментария
     /// </summary>
-    public Guid UserId { get; set; }
+    public Guid EmployeeId { get; set; }
     
     /// <summary>
     /// Задача, в которой был оставлен коментарий
@@ -39,9 +39,9 @@ public class Comment : BaseActualEntity
         
     }
 
-    public Comment(Guid userId, Guid taskId, string text)
+    public Comment(Guid employeeId, Guid taskId, string text)
     {
-        UserId = userId;
+        EmployeeId = employeeId;
         TaskId = taskId;
         Text = text;
     }

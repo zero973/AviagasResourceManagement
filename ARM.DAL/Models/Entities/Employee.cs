@@ -5,6 +5,7 @@ namespace ARM.DAL.Models.Entities;
 
 public class Employee : BaseActualEntity
 {
+    
     /// <summary>
     /// Имя
     /// </summary>
@@ -54,6 +55,10 @@ public class Employee : BaseActualEntity
     public ICollection<SystemTask> Tasks { get; set; }
     
     public ICollection<TaskEmployee> TaskEmployees { get; set; }
+    
+    public ICollection<Comment> Comments { get; set; }
+    
+    public ICollection<WorkedTime> WorkedTimes { get; set; }
 
     public Employee(string firstName, string lastName, string patronymic, DateTime birthday, string passport)
     {

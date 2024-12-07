@@ -17,14 +17,14 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
     private readonly IDbEntitiesRepository<WorkedTime> _workedHoursRepository;
     private readonly IDbEntitiesRepository<Comment> _commentsRepository;
     private readonly IDbEntitiesRepository<CabinetPartCounts> _cabinetPartCountsRepository;
-    private readonly IDbEntitiesRepository<Employee> _employeesRepository;
+    private readonly IDbEntitiesRepository<EmployeeAccount> _employeesRepository;
     private readonly IDbEntitiesRepository<CabinetPart> _cabinetPartsRepository;
     
     public SystemTasksRepository(AppDbContext context, IMapper mapper, ILogger<SystemTasksRepository> logger, 
             IDbEntitiesRepository<WorkedTime> workedHoursRepository, IDbEntitiesRepository<Comment> commentsRepository, 
             IDbEntitiesRepository<TaskEmployee> taskEmployeesRepository, 
             IDbEntitiesRepository<CabinetPartCounts> cabinetPartCountsRepository, 
-            IDbEntitiesRepository<Employee> employeesRepository, 
+            IDbEntitiesRepository<EmployeeAccount> employeesRepository, 
             IDbEntitiesRepository<CabinetPart> cabinetPartsRepository)
         : base(context, mapper, logger)
     {

@@ -35,12 +35,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseRouting();
 app.UseAuthorization();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.UseRouting();
+app.MapControllers();
+app.UseResponseCompression();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
@@ -53,6 +51,8 @@ void RegisterControllersWithServices()
 {
     builder.Logging.ClearProviders();
     builder.Logging.AddConsole();
+
+    builder.Services.AddResponseCompression(opt => opt.EnableForHttps = true);
     
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(x =>
@@ -145,10 +145,11 @@ void RegisterControllersWithServices()
     
     builder.Services.RegisterEntityRepositoriesFromAssembly();
     builder.Services.AddTransient<IRefreshTokensRepository, RefreshTokensRepository>();
+    builder.Services.AddTransient<IStatisticsRepository, StatisticsRepository>();
     
     builder.Services.AddTransient<IJwtService, JwtService>();
 
-    builder.Services.AddValidatorsFromAssemblyContaining<AppUserValidator>();
+    builder.Services.AddValidatorsFromAssemblyContaining<EmployeeAccountValidator>();
     
     builder.Services.RegisterMediatR();
     
@@ -174,14 +175,15 @@ void WriteAppVersion()
     logger.LogInformation($"Версия приложения: {Assembly.GetExecutingAssembly().GetName().Version}");
 }
 
-void RunMigrations()
+async void RunMigrations()
 {
-    logger.LogInformation("Запуск миграций...");
-
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    var version = await dbContext.GetDatabaseVersion();
+    logger.LogInformation($"Версия базы данных: {version}");
     
+    logger.LogInformation("Запуск миграций...");
     //dbContext.Database.Migrate();
-    
     logger.LogInformation("Миграции выполнены");
 }

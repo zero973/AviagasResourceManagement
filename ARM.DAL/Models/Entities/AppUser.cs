@@ -17,10 +17,6 @@ public class AppUser: BaseActualEntity
     public Employee Employee { get; set; }
     
     public Guid EmployeeId { get; set; }
-    
-    public ICollection<Comment> Comments { get; set; }
-    
-    public ICollection<WorkedTime> WorkedTimes { get; set; }
 
     public AppUser()
     {
@@ -33,6 +29,7 @@ public class AppUser: BaseActualEntity
         PasswordHash = passwordHash;
         Role = role;
         EmployeeId = employeeId;
+        Id = employeeId;
     }
     
 }

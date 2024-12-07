@@ -9,9 +9,9 @@ namespace ARM.WebApi.Controllers.Entities;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class CommentController : BaseActualEntityController<Comment>
+public class CabinetsController : BaseEntityController<Cabinet>
 {
-    public CommentController(ISender sender) : base(sender)
+    public CabinetsController(ISender sender) : base(sender)
     {
         
     }

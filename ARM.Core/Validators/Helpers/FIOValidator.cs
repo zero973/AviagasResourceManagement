@@ -19,7 +19,7 @@ public class FIOValidator : AbstractValidator<string>
 
     private bool BeAValidFIO(string number)
     {
-        var allowedSymbols = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ";
+        var allowedSymbols = "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ ";
         var lowerAllowedSymbols = allowedSymbols.ToLower();
         foreach (var c in number)
             if (!allowedSymbols.Contains(c) && !lowerAllowedSymbols.Contains(c))

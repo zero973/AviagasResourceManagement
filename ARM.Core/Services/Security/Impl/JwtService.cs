@@ -24,7 +24,7 @@ public class JwtService : IJwtService
         _refreshTokensRepository = refreshTokensRepository;
     }
 
-    public async Task<TokensPair> GenerateTokenForUser(AppUser user, string deviceId)
+    public async Task<TokensPair> GenerateTokenForUser(EmployeeAccount user, string deviceId)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var signingKey = Encoding.ASCII.GetBytes(_jwtSettings.SigningKey);
