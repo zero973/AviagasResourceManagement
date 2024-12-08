@@ -18,7 +18,7 @@ public class BaseListParamsModelBinder : IModelBinder
 
         var queryPageNumber = bindingContext.ValueProvider.GetValue("PageNumber").FirstValue;
         var queryRowsCount = bindingContext.ValueProvider.GetValue("RowsCount").FirstValue;
-        var queryOrderBy = (bindingContext.ValueProvider as IEnumerableValueProvider).GetKeysFromPrefix("OrderBy");
+        var queryOrderBy = (bindingContext.ValueProvider as IEnumerableValueProvider)!.GetKeysFromPrefix("OrderBy");
         var queryFilters = bindingContext.ValueProvider.GetValue("Filters").FirstValue;
 
         var pageNumber = Convert.ToInt32(queryPageNumber);
@@ -33,7 +33,7 @@ public class BaseListParamsModelBinder : IModelBinder
             filters = JsonSerializer.Deserialize<List<ComplexFilter>>(queryFilters);
 
         // если передан массив, то преобразовываем его в соответствующий тип данных
-        foreach (var filter in filters)
+        foreach (var filter in filters!)
         {
             if (filter.Operator != ComplexFilterOperators.In)
                 continue;

@@ -9,5 +9,14 @@ public class SystemTaskValidator : AbstractValidator<SystemTask>
     {
         RuleFor(x => x.Name).MinimumLength(1)
             .WithMessage("Название задачи должно быть больше 1 символа");
+
+        RuleFor(x => x.FinishDate)
+            .Must((task, date) =>
+            {
+                if (date.HasValue && task.CreateDate > date)
+                    return false;
+                return true;
+            })
+            .WithMessage("Дата завершения задачи не может быть меньше, чем дата создания");
     }
 }

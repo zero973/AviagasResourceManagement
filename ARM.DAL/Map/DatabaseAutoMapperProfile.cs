@@ -21,9 +21,6 @@ public class DatabaseAutoMapperProfile : Profile
         CreateMap<Core.Models.Entities.EmployeeAccount, Models.Entities.Employee>()
             .ReverseMap();
         
-        CreateMap<Models.Entities.Employee, Core.Models.Entities.Employee>()
-            .ForPath(x => x.SalaryForOneHour, x => x.MapFrom(y => y.Salary!.SalaryForOneHour));
-        
         CreateMap<Core.Models.Entities.SystemTask, Models.Entities.SystemTask>()
             .ReverseMap();
         

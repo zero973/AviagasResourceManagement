@@ -8,7 +8,7 @@ namespace ARM.Core.Validators.Requests;
 public class ChangeTaskPerformerValidator : AbstractValidator<ChangeTaskPerformer>
 {
     public ChangeTaskPerformerValidator(IDbEntitiesRepository<SystemTask> taskRepository, 
-        IDbEntitiesRepository<Employee> employeeRepository)
+        IDbEntitiesRepository<EmployeeAccount> employeeRepository)
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         

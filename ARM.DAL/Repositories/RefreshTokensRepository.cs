@@ -1,5 +1,4 @@
-﻿using ARM.Core.Models.UI;
-using ARM.DAL.Models.Security;
+﻿using ARM.DAL.Models.Security;
 using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using AutoMapper;
@@ -29,8 +28,8 @@ public class RefreshTokensRepository : IRefreshTokensRepository
     {
         try
         {
-            var result = await _context.Set<RefreshToken>()
-                .SingleAsync(x => x.Token.Equals(token));
+            var result = await _context.RefreshTokens
+                .SingleAsync(x => x.Token == token);
             return _mapper.Map<Core.Models.Security.RefreshToken>(result);
         }
         catch (Exception ex) 

@@ -1,8 +1,12 @@
-﻿namespace ARM.DAL.Models.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
+
+namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Сотрудник, прикреплённый к задаче
 /// </summary>
+[Table(DbConstants.TaskEmployeeTableName, Schema = DbConstants.DataSchema)]
 public class TaskEmployee : BaseEntity
 {
     

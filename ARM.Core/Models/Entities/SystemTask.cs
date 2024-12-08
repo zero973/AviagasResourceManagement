@@ -39,6 +39,11 @@ public class SystemTask : BaseActualEntity
     public DateTime Deadline { get; set; }
     
     /// <summary>
+    /// Дата закрытия задачи (когда она была выполнена)
+    /// </summary>
+    public DateTime? FinishDate { get; set; }
+    
+    /// <summary>
     /// Предполагаемые часы работы над задачей
     /// </summary>
     public int EstimatedWorkHours { get; set; }
@@ -57,6 +62,6 @@ public class SystemTask : BaseActualEntity
     /// Детали, которые нужны для выполнения задачи.
     /// Key - деталь шкафа, ключ - количество.
     /// </summary>
-    public Dictionary<CabinetPart, int> CabinetParts { get; set; } = new();
+    public List<CabinetPartCounts> CabinetParts { get; set; } = new();
     
 }

@@ -9,7 +9,7 @@ public class Comment : BaseActualEntity
     /// <summary>
     /// Автор комментария
     /// </summary>
-    public required Guid UserId { get; set; }
+    public required Guid EmployeeId { get; set; }
     
     /// <summary>
     /// Задача, в которй был оставлен коментарий

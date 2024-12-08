@@ -1,12 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ARM.Core.Enums;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Задача на сбор шкафа
 /// </summary>
+[Table(DbConstants.TaskTableName, Schema = DbConstants.DataSchema)]
 public class SystemTask : BaseActualEntity
 {
     
@@ -46,6 +48,12 @@ public class SystemTask : BaseActualEntity
     /// </summary>
     [Column(TypeName = "timestamp without time zone")]
     public DateTime Deadline { get; set; }
+    
+    /// <summary>
+    /// Дата закрытия задачи
+    /// </summary>
+    [Column(TypeName = "timestamp without time zone")]
+    public DateTime? FinishDate { get; set; }
     
     /// <summary>
     /// Предполагаемые часы работы над задачей

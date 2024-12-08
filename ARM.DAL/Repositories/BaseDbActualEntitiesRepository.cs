@@ -22,7 +22,7 @@ public abstract class BaseDbActualEntitiesRepository<T, U> : BaseDbEntitiesRepos
     protected readonly ILogger<BaseDbActualEntitiesRepository<T, U>> _logger;
 
     protected BaseDbActualEntitiesRepository(AppDbContext context, IMapper mapper, 
-            ILogger<BaseDbActualEntitiesRepository<T, U>> logger) 
+        ILogger<BaseDbActualEntitiesRepository<T, U>> logger) 
         : base(context, mapper, logger)
     {
         _context = context;

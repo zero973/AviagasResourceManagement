@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
+[Table(DbConstants.EmployeeTableName, Schema = DbConstants.DataSchema)]
 public class Employee : BaseActualEntity
 {
     

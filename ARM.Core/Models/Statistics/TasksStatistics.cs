@@ -51,6 +51,11 @@ public class TasksStatistics
     /// </summary>
     public decimal TotalCost { get; set; }
 
+    public TasksStatistics()
+    {
+        
+    }
+    
     public TasksStatistics(Guid taskId, string taskName, TaskStatus status, int estimatedWorkHours, int realWorkedHours, 
         decimal totalSalary, int totalCabinetPartCount, decimal totalCabinetPartsCost, decimal totalCost)
     {

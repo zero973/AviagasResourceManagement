@@ -47,11 +47,11 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
             var result = _mapper.Map<SystemTask>(taskDb);
 
             var taskIdFilter = new BaseListParams()
-                .WithActualPagination()
+                .WithPagination()
                 .WithFilter(nameof(Models.Entities.TaskEmployee.TaskId), ComplexFilterOperators.Equals, id);
             
             var employeesIds = (await _taskEmployeesRepository.GetAll(taskIdFilter)).Data
-                .Select(x => x.EmployeeId)
+                .Select(x => (object)x.EmployeeId)
                 .ToArray();
             
             var prms = new BaseListParams()
@@ -59,21 +59,30 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
                 .WithFilter(nameof(Models.Entities.Employee.Id), ComplexFilterOperators.In, employeesIds);
             
             var employees = (await _employeesRepository.GetAll(prms)).Data;
+
+            taskIdFilter = taskIdFilter.WithActualPagination();
             
             var workedHours = (await _workedHoursRepository.GetAll(taskIdFilter)).Data.Sum(x => x.Hours);
             
             var comments = (await _commentsRepository.GetAll(taskIdFilter)).Data;
             
             var cabinetPartCountsIds = (await _cabinetPartCountsRepository.GetAll(taskIdFilter)).Data
-                .ToDictionary(x => x.CabinetPartId, x => x.Count);
+                .ToDictionary(x => x.CabinetPartId, x => x);
             
             prms = new BaseListParams()
-                .WithActualPagination()
+                .WithPagination()
                 .WithFilter(nameof(Models.Entities.CabinetPart.Id), ComplexFilterOperators.In, 
-                    cabinetPartCountsIds.Select(x => x.Key).ToArray());
+                    cabinetPartCountsIds.Select(x => (object)x.Key).ToArray());
             
             var cabinetPartCounts = (await _cabinetPartsRepository.GetAll(prms)).Data
-                .ToDictionary(x => x, x => cabinetPartCountsIds[x.Id]);
+                .Select(x => new CabinetPartCounts()
+                {
+                    Id = cabinetPartCountsIds[x.Id].Id,
+                    CabinetPart = x, 
+                    CabinetPartId = x.Id, 
+                    Count = cabinetPartCountsIds[x.Id].Count, 
+                    TaskId = id
+                }).ToList();
 
             result.Employees = employees;
             result.RealWorkedHours = workedHours;

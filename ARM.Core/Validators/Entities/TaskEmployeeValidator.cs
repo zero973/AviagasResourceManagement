@@ -7,7 +7,7 @@ namespace ARM.Core.Validators.Entities;
 public class TaskEmployeeValidator  : AbstractValidator<TaskEmployee>
 {
     public TaskEmployeeValidator(IDbEntitiesRepository<SystemTask> taskRepository, 
-        IDbEntitiesRepository<Employee> employeeRepository)
+        IDbEntitiesRepository<EmployeeAccount> employeeRepository)
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         

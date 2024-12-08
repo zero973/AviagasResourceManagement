@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Зарплата сотрудника в час
 /// </summary>
+[Table(DbConstants.EmployeeSalaryTableName, Schema = DbConstants.DataSchema)]
 public class EmployeeSalary : BaseActualEntity
 {
     

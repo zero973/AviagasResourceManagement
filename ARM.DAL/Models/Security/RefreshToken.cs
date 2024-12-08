@@ -8,7 +8,7 @@ public class RefreshToken
     /// <summary>
     /// Server-generated token Id used on client
     /// </summary>
-    public string Token { get; } = Guid.NewGuid().ToString();
+    public string Token { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// Access token Id that is related to this refresh token

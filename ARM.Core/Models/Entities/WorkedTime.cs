@@ -7,14 +7,14 @@ public class WorkedTime : BaseActualEntity
 {
 
     /// <summary>
-    /// Пользователь
+    /// Сотрудник
     /// </summary>
-    public required Guid EmployeeId { get; set; }
+    public Guid EmployeeId { get; set; }
     
     /// <summary>
     /// Задача, над которой работал сотрудник
     /// </summary>
-    public required Guid TaskId { get; set; }
+    public Guid TaskId { get; set; }
 
     /// <summary>
     /// День, за который пользователь списывает время

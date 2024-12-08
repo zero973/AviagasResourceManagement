@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         var assembly = baseRepoType.Assembly;
 
         var repositories = assembly.GetTypes()
-            .Where(x => !x.IsAbstract && x.BaseType.GUID.Equals(baseRepoType.GUID)).ToList();
+            .Where(x => !x.IsAbstract && x.BaseType!.GUID.Equals(baseRepoType.GUID)).ToList();
 
         foreach (var repository in repositories)
             services.AddTransient(repository.GetInterfaces()[0], repository);
@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
         baseRepoType = typeof(BaseDbActualEntitiesRepository<,>);
         
         repositories = assembly.GetTypes()
-            .Where(x => !x.IsAbstract && x.BaseType.GUID.Equals(baseRepoType.GUID)).ToList();
+            .Where(x => !x.IsAbstract && x.BaseType!.GUID.Equals(baseRepoType.GUID)).ToList();
 
         foreach (var repository in repositories)
             services.AddTransient(repository.GetInterfaces()[0], repository);

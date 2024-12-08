@@ -18,6 +18,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
+using NLog.Web;
 
 SetDefaultCulture();
 
@@ -35,8 +37,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();
 app.UseRouting();
+app.UseAuthorization();
 app.MapControllers();
 app.UseResponseCompression();
 
@@ -49,8 +51,7 @@ app.Run();
 
 void RegisterControllersWithServices()
 {
-    builder.Logging.ClearProviders();
-    builder.Logging.AddConsole();
+    ConfigureLogger();
 
     builder.Services.AddResponseCompression(opt => opt.EnableForHttps = true);
     
@@ -137,13 +138,14 @@ void RegisterControllersWithServices()
     {
         opts.UseNpgsql(configuration.GetConnectionString("Postgres"), options =>
         {
-            options.SetPostgresVersion(new Version(17, 1, 0));
+            options.SetPostgresVersion(new Version(17, 2, 0));
             options.MigrationsAssembly(typeof(AppDbContext).Assembly);
         });
         opts.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     });
     
     builder.Services.RegisterEntityRepositoriesFromAssembly();
+    builder.Services.AddTransient<IAuthorizationRepository, EmployeesRepository>();
     builder.Services.AddTransient<IRefreshTokensRepository, RefreshTokensRepository>();
     builder.Services.AddTransient<IStatisticsRepository, StatisticsRepository>();
     
@@ -168,6 +170,14 @@ void SetDefaultCulture()
 
     CultureInfo.DefaultThreadCurrentCulture = culture;
     CultureInfo.DefaultThreadCurrentUICulture = culture;
+}
+
+void ConfigureLogger()
+{
+    builder.Logging.ClearProviders();
+    
+    LogManager.Setup().LoadConfigurationFromAppSettings();
+    builder.Host.UseNLog();
 }
 
 void WriteAppVersion()

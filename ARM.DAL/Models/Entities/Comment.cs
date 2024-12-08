@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Комментарий в задаче
 /// </summary>
+[Table(DbConstants.CommentTableName, Schema = DbConstants.DataSchema)]
 public class Comment : BaseActualEntity
 {
     

@@ -1,7 +1,4 @@
-﻿using ARM.Core.Commands.Requests.Entities;
-using ARM.Core.Commands.Requests.Entities.ActualEntities;
-using ARM.Core.Enums;
-using ARM.Core.Extensions;
+﻿using ARM.Core.Commands.Requests.Entities.ActualEntities;
 using ARM.Core.Helpers;
 using ARM.Core.Models.Entities;
 using ARM.Core.Models.Security;
@@ -17,31 +14,31 @@ public class AuthorizationService : IAuthorizationService
 
     private readonly IJwtService _jwtService;
     private readonly IRefreshTokensRepository _refreshTokensRepository;
+    private readonly IAuthorizationRepository _authorizationRepository;
     private readonly ISender _sender;
     private readonly TokenValidationParameters _tokenValidationParameters;
     
     public AuthorizationService(IJwtService jwtService, IRefreshTokensRepository refreshTokensRepository, 
-        ISender sender, TokenValidationParameters tokenValidationParameters)
+        ISender sender, TokenValidationParameters tokenValidationParameters, 
+        IAuthorizationRepository authorizationRepository)
     {
         _jwtService = jwtService;
         _sender = sender;
         _refreshTokensRepository = refreshTokensRepository;
         _tokenValidationParameters = tokenValidationParameters;
+        _authorizationRepository = authorizationRepository;
     }
     
     public async Task<Result<TokensPair>> LogIn(LogInCredentials credentials, string deviceId)
     {
         var passwordHash = Encryptor.EncryptString(credentials.Password);
-        var prms = new BaseListParams()
-            .WithActualFilter()
-            .WithFilter(nameof(EmployeeAccount.Login), ComplexFilterOperators.Equals, credentials.Login)
-            .WithFilter(nameof(EmployeeAccount.PasswordHash), ComplexFilterOperators.Equals, passwordHash);
-        var userResult = await _sender.Send(new GetAllDataRequest<EmployeeAccount>(prms));
 
-        if (!userResult.Data.Any())
+        var userResult = await _authorizationRepository.GetUserByLoginAndPassword(credentials.Login, passwordHash);
+
+        if (!userResult.IsSuccess)
             return new Result<TokensPair>("Пользователь с таким логином и паролем не найден");
         
-        var user = userResult.Data.Single();
+        var user = userResult.Data;
 
         await _refreshTokensRepository.RevokeTokenIfExists(user.Id, deviceId);
 
@@ -56,8 +53,7 @@ public class AuthorizationService : IAuthorizationService
         var newUser = new EmployeeAccount()
         {
             Login = credentials.Login,
-            PasswordHash = Encryptor.EncryptString(credentials.Password),
-            EmployeeId = Guid.Empty
+            PasswordHash = Encryptor.EncryptString(credentials.Password)
         };
 
         var token = await _jwtService.GenerateTokenForUser(newUser, deviceId);

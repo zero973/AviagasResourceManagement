@@ -108,7 +108,7 @@
 
       axios({
         method: 'get',
-        url: '/api/Cabinet/GetAll',
+        url: '/api/Cabinets/GetAll',
         params: params,
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@
       'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
     };
 
-    await axios.post('/api/Cabinet/Add', newCabinet,
+    await axios.post('/api/Cabinets/Add', newCabinet,
       {
         headers: headers
       })
@@ -155,7 +155,7 @@
       'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
     };
 
-    await axios.post('/api/Cabinet/Update', cabinet,
+    await axios.post('/api/Cabinets/Update', cabinet,
       {
         headers: headers
       })
@@ -175,7 +175,7 @@
       'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
     };
 
-    await axios.post('/api/Cabinet/Delete', cabinet,
+    await axios.post('/api/Cabinets/Delete', cabinet,
       {
         headers: headers
       })

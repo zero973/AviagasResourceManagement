@@ -1,8 +1,12 @@
-﻿namespace ARM.DAL.Models.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
+
+namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Кол-во деталей, которое привязано к задаче
 /// </summary>
+[Table(DbConstants.CabinetPartCountsTableName, Schema = DbConstants.DataSchema)]
 public class CabinetPartCounts : BaseActualEntity
 {
     

@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Шкаф
 /// </summary>
+[Table(DbConstants.CabinetTableName, Schema = DbConstants.KernelSchema)]
 public class Cabinet : BaseEntity
 {
     

@@ -9,11 +9,6 @@ public class EmployeeAccount : BaseActualEntity
 {
     
     /// <summary>
-    /// Связанный сотрудник
-    /// </summary>
-    public Guid EmployeeId { get; set; }
-    
-    /// <summary>
     /// Логин
     /// </summary>
     public string Login { get; set; }
@@ -63,10 +58,9 @@ public class EmployeeAccount : BaseActualEntity
         
     }
     
-    public EmployeeAccount(Guid employeeId, string login, UsersRoles role, string fio, 
+    public EmployeeAccount(string login, UsersRoles role, string fio, 
         DateTime birthday, string passport, decimal salaryForOneHour, string? photoUrl)
     {
-        EmployeeId = employeeId;
         Login = login;
         Role = role;
         FIO = fio;

@@ -53,7 +53,7 @@ public class AuthorizationController : ControllerBase
     [Authorize]
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> GetCurrentUserId()
+    public JsonResult GetCurrentUserId()
     {
         return new JsonResult(_userIdentityProvider.GetCurrentUserIdentity().UserId);
     }

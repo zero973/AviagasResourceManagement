@@ -9,6 +9,11 @@ public class CabinetPartCounts : BaseEntity
     /// <summary>
     /// Деталь шкафа
     /// </summary>
+    public CabinetPart? CabinetPart { get; set; }
+    
+    /// <summary>
+    /// Деталь шкафа
+    /// </summary>
     public Guid CabinetPartId { get; set; }
     
     /// <summary>

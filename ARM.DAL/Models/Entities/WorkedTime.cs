@@ -1,18 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
 /// <summary>
 /// Отработанное время сотрудника
 /// </summary>
+[Table(DbConstants.WorkedTimeTableName, Schema = DbConstants.DataSchema)]
 public class WorkedTime : BaseActualEntity
 {
     
     /// <summary>
-    /// Пользователь
+    /// Сотрудник
     /// </summary>
     public Employee Employee { get; set; }
     
+    /// <summary>
+    /// Сотрудник
+    /// </summary>
     public Guid EmployeeId { get; set; }
     
     /// <summary>

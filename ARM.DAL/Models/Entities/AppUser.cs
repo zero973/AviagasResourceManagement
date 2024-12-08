@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ARM.Core.Enums;
+using ARM.DAL.Constants;
 
 namespace ARM.DAL.Models.Entities;
 
+[Table(DbConstants.UsersTableName, Schema = DbConstants.DataSchema)]
 public class AppUser: BaseActualEntity
 {
     
