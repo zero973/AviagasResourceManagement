@@ -17,4 +17,10 @@ public interface IStatisticsRepository
     /// <returns>Статистика за месяц</returns>
     Task<Result<List<TasksStatistics>>> GetTasksStatisticsForMonth(DateTime month);
 
+    /// <summary>
+    /// Планирование будущих расходов. Расходы рассчитываются основываясь на статистике соотвествующих шкафов.
+    /// </summary>
+    /// <returns>Возвращает планируемые расходы</returns>
+    Task<Result<List<PlainExpensesStatistics>>> GetPlainExpenses(List<CabinetsCounts> plainCabinets);
+
 }

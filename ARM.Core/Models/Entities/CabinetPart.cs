@@ -1,7 +1,7 @@
 ﻿namespace ARM.Core.Models.Entities;
 
 /// <summary>
-/// Деталь шкафа
+/// Деталь электрощита управления станцией
 /// </summary>
 public class CabinetPart : BaseEntity
 {

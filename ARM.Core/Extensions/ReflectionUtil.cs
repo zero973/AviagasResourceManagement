@@ -12,7 +12,7 @@ public static class ReflectionUtil
     {
         PropertyInfo property = type.GetProperties().FirstOrDefault(x => x.Name.ToLower().Equals(name.ToLower()));
         if (property == null)
-            return null;
+            throw new Exception($"Не найдено свойство(property) с названием {name} в классе {type.Name}");
 
         return property.DeclaringType.GetProperty(property.Name);
     }

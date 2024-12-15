@@ -22,3 +22,8 @@ public record ChangeTaskPerformer(Guid TaskId, Guid EmployeeId) : IRequest<Resul
 /// </summary>
 /// <param name="Month">Месяц, за который выгружаются данные</param>
 public record GetTasksStatistics(DateTime Month) : IRequest<Result<List<TasksStatistics>>>;
+
+/// <summary>
+/// Команда для расчёта затрат при сборке новых электрощитов управления
+/// </summary>
+public record GetPlainExpenses(List<CabinetsCounts> Counts) : IRequest<Result<List<PlainExpensesStatistics>>>;

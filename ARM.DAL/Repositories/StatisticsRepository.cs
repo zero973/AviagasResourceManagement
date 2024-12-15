@@ -91,4 +91,9 @@ public class StatisticsRepository : IStatisticsRepository
         }
     }
     
+    public async Task<Result<List<PlainExpensesStatistics>>> GetPlainExpenses(List<CabinetsCounts> plainCabinets)
+    {
+        throw new NotImplementedException();
+    }
+    
 }

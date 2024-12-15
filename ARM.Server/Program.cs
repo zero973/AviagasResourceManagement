@@ -14,6 +14,7 @@ using ARM.DAL.Repositories;
 using ARM.WebApi.Extensions;
 using ARM.WebApi.Identity.Providers;
 using ARM.WebApi.Infrastructure.ModelBinders.Providers;
+using ARM.WebApi.Middlewares;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseRouting();
