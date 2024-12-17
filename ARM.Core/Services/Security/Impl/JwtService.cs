@@ -49,9 +49,9 @@ public class JwtService : IJwtService
                 new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature)
         };
 
-        //var encryptingKey = Encoding.ASCII.GetBytes(_jwtSettings.EncryptionKey!);
-        //tokenDescriptor.EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptingKey),
-        //    JwtConstants.DirectKeyUseAlg, SecurityAlgorithms.Aes256CbcHmacSha512);
+        var encryptingKey = Encoding.ASCII.GetBytes(_jwtSettings.EncryptionKey!);
+        tokenDescriptor.EncryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptingKey),
+            JwtConstants.DirectKeyUseAlg, SecurityAlgorithms.Aes256CbcHmacSha512);
 
         var accessToken = tokenHandler.CreateToken(tokenDescriptor);
         var refreshToken = new RefreshToken

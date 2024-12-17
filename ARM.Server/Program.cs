@@ -107,7 +107,8 @@ void RegisterControllersWithServices()
         ValidIssuer = configuration["JwtSettings:Issuer"]!,
         ValidateIssuer = true,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+        TokenDecryptionKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSettings:EncryptionKey"]!))
     };
     builder.Services.AddSingleton(tokenValidationParameters);
 
