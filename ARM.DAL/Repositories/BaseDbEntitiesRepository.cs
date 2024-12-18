@@ -105,6 +105,14 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
         try
         {
             var entityForSave = _mapper.Map<U>(entity);
+            
+            var res = _context
+                .ChangeTracker
+                .Entries<U>()
+                .FirstOrDefault(x => x.State != EntityState.Detached && x.Entity.Id == entity.Id);
+            if (res is not null)
+                res.State = EntityState.Detached;
+            
             _context.Set<U>().Update(entityForSave);
 
             await SaveChanges();
