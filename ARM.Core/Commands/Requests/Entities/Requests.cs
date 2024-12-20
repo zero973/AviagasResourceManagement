@@ -29,4 +29,4 @@ public record EditDataRequest<T>(T Entity) : IRequest<Result<T>> where T : class
 /// <summary>
 /// Команда на удаление данных в БД
 /// </summary>
-public record DeleteDataRequest<T>(T Entity) : IRequest<Result<T>> where T : class, IEntity;
+public record DeleteDataRequest<T>(Guid Id) : IRequest<Result<T>> where T : class, IEntity;

@@ -5,7 +5,7 @@ using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
 using MediatR;
 
-namespace ARM.Core.Commands.Handlers.Entities.Concrete.Task;
+namespace ARM.Core.Commands.Handlers.Entities.Concrete.Statistics;
 
 public class GetTasksStatisticsHandler : IRequestHandler<GetTasksStatistics, Result<List<TasksStatistics>>>
 {

@@ -28,7 +28,8 @@ public static class ServiceCollectionExtensions
             .Where(x => !x.IsAbstract && x.BaseType!.GUID.Equals(baseRepoType.GUID)).ToList();
 
         foreach (var repository in repositories)
-            services.AddTransient(repository.GetInterfaces()[0], repository);
+            foreach (var intf in repository.GetInterfaces())
+                services.AddTransient(intf, repository);
     }
 
     /// <summary>

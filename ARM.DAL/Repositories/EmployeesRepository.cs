@@ -157,7 +157,7 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
 
             if (newSalary.SalaryForOneHour != curSalary.SalaryForOneHour)
             {
-                await DeleteSalary(curSalary, entity);
+                await DeleteSalary(curSalary, entityForSave.UpdatedUserId!.Value);
                 curSalary = await AddSalary(newSalary, entity);
             }
 
@@ -174,33 +174,31 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
         }
     }
 
-    public override async Task<Result<EmployeeAccount>> Remove(EmployeeAccount entity)
+    public override async Task<Result<object>> Remove(Guid id, Guid userId)
     {
         try
         {
-            entity.IsActual = false;
-
-            await _context.Employees.Where(x => x.Id == entity.Id)
+            await _context.Employees.Where(x => x.Id == id)
                 .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsActual, _ => false)
-                    .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
-                    .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
+                    .SetProperty(p => p.DeleteDate, _ => DateTime.Now)
+                    .SetProperty(p => p.DeletedUserId, _ => userId));
 
-            await _context.Users.Where(x => x.Id == entity.Id)
+            await _context.Users.Where(x => x.Id == id)
                 .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsActual, _ => false)
-                    .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
-                    .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
+                    .SetProperty(p => p.DeleteDate, _ => DateTime.Now)
+                    .SetProperty(p => p.DeletedUserId, _ => userId));
             
             var curSalary = await _context.EmployeeSalaries
-                .SingleAsync(x => x.EmployeeId == entity.Id && x.IsActual);
+                .SingleAsync(x => x.EmployeeId == id && x.IsActual);
 
-            await DeleteSalary(curSalary, entity);
+            await DeleteSalary(curSalary, userId);
 
-            return new Result<EmployeeAccount>(true, entity);
+            return new Result<object>(true, null);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<EmployeeAccount>("Произошла ошибка при удалении сущности");
+            return new Result<object>("Произошла ошибка при удалении сущности");
         }
     }
 
@@ -211,22 +209,15 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
         return (await _context.EmployeeSalaries.AddAsync(salary)).Entity;
     }
 
-    private async Task DeleteSalary(EmployeeSalary salary, EmployeeAccount employee)
+    private async Task DeleteSalary(EmployeeSalary salary, Guid userId)
     {
-        salary.IsActual = false;
-        salary.End = DateTime.Now;
-        salary.UpdateDate = DateTime.Now;
-        salary.UpdatedUserId = employee.UpdatedUserId;
-        salary.DeleteDate = DateTime.Now;
-        salary.DeletedUserId = employee.DeletedUserId;
-        
         await _context.EmployeeSalaries.Where(x => x.Id == salary.Id)
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsActual, _ => false)
-                .SetProperty(p => p.End, e => e.End)
-                .SetProperty(p => p.UpdateDate, e => e.UpdateDate)
-                .SetProperty(p => p.UpdatedUserId, e => e.UpdatedUserId)
-                .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
-                .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
+                .SetProperty(p => p.End, _ => DateTime.Now)
+                .SetProperty(p => p.UpdateDate, _ => DateTime.Now)
+                .SetProperty(p => p.UpdatedUserId, _ => userId)
+                .SetProperty(p => p.DeleteDate, _ => DateTime.Now)
+                .SetProperty(p => p.DeletedUserId, _ => userId));
     }
 
     private AppUser GetAppUser(EmployeeAccount user) 

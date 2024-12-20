@@ -14,10 +14,10 @@ namespace ARM.Core.Commands.Handlers.Entities.Concrete.Task;
 public class ChangeTaskPerformerHandler : IRequestHandler<ChangeTaskPerformer, Result<SystemTask>>
 {
     
-    private readonly IDbEntitiesRepository<SystemTask> _repository;
+    private readonly IDbActualEntitiesRepository<SystemTask> _repository;
     private readonly IValidator<ChangeTaskPerformer> _validator;
 
-    public ChangeTaskPerformerHandler(IDbEntitiesRepository<SystemTask> repository, 
+    public ChangeTaskPerformerHandler(IDbActualEntitiesRepository<SystemTask> repository, 
         IValidator<ChangeTaskPerformer> validator)
     {
         _repository = repository;

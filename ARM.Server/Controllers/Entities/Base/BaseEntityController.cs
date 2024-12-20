@@ -41,18 +41,18 @@ public abstract class BaseEntityController<T> : ControllerBase
         return new JsonResult(await _sender.Send(new AddDataRequest<T>(entity)));
     }
 
-    [HttpPost]
+    [HttpPut]
     [Route("[action]")]
     public virtual async Task<JsonResult> Update([FromBody] T entity)
     {
         return new JsonResult(await _sender.Send(new EditDataRequest<T>(entity)));
     }
 
-    [HttpPost]
+    [HttpDelete]
     [Route("[action]")]
-    public virtual async Task<JsonResult> Delete([FromBody] T entity)
+    public virtual async Task<JsonResult> Delete([FromQuery] Guid id)
     {
-        return new JsonResult(await _sender.Send(new DeleteDataRequest<T>(entity)));
+        return new JsonResult(await _sender.Send(new DeleteDataRequest<T>(id)));
     }
     
 }

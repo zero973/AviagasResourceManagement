@@ -11,10 +11,10 @@ public class DeleteActualDataHandler<T> : IRequestHandler<DeleteActualDataReques
     where T : class, IActualEntity
 {
     
-    protected readonly IDbEntitiesRepository<T> _repository;
+    protected readonly IDbActualEntitiesRepository<T> _repository;
     protected readonly IUserIdentityProvider _authService;
 
-    public DeleteActualDataHandler(IDbEntitiesRepository<T> repository, IUserIdentityProvider authService)
+    public DeleteActualDataHandler(IDbActualEntitiesRepository<T> repository, IUserIdentityProvider authService)
     {
         _repository = repository;
         _authService = authService;
@@ -22,10 +22,8 @@ public class DeleteActualDataHandler<T> : IRequestHandler<DeleteActualDataReques
 
     public virtual async Task<Result<T>> Handle(DeleteActualDataRequest<T> request, CancellationToken cancellationToken)
     {
-        request.Entity.DeleteDate = DateTime.Now;
-        request.Entity.DeletedUserId = _authService.GetCurrentUserIdentity().UserId;
-
-        return await _repository.Remove(request.Entity);
+        var result = await _repository.Remove(request.Id, _authService.GetCurrentUserIdentity().UserId);
+        return new Result<T>(result.IsSuccess, null, result.Message);
     }
 
 }

@@ -26,7 +26,7 @@ SetDefaultCulture();
 
 var builder = WebApplication.CreateBuilder(args);
 
-RegisterControllersWithServices();
+ConfigureServices();
 
 var app = builder.Build();
 
@@ -51,7 +51,7 @@ RunMigrations();
 
 app.Run();
 
-void RegisterControllersWithServices()
+void ConfigureServices()
 {
     ConfigureLogger();
 

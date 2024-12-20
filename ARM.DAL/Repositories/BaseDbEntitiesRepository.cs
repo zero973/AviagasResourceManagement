@@ -37,7 +37,7 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
     {
         try
         {
-            var result = await _context.Set<U>().SingleAsync(x => x.Id == id);
+            var result = await _context.Set<U>().FindAsync(id);
             return new Result<T>(true, _mapper.Map<T>(result));
         }
         catch (Exception ex) 
@@ -133,20 +133,20 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
         await SaveChanges();
     }
 
-    public virtual async Task<Result<T>> Remove(T entity)
+    public virtual async Task<Result<object>> Remove(Guid id)
     {
         try
         {
-            var entityForSave = _mapper.Map<U>(entity);
-            _context.Set<U>().Remove(entityForSave);
+            var entity = await _context.FindAsync<U>(id);
+            _context.Set<U>().Remove(entity!);
 
             await SaveChanges();
-            return new Result<T>(true, _mapper.Map<T>(entityForSave));
+            return new Result<object>(true, "");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<T>("Произошла ошибка при удалении сущности");
+            return new Result<object>("Произошла ошибка при удалении сущности");
         }
     }
 

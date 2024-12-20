@@ -12,7 +12,7 @@ namespace ARM.Core.Commands.Handlers.Entities.Concrete.Task;
 public class AddTaskHandler : AddActualDataHandler<SystemTask>
 {
     
-    public AddTaskHandler(IDbEntitiesRepository<SystemTask> repository, IValidator<SystemTask> validator, 
+    public AddTaskHandler(IDbActualEntitiesRepository<SystemTask> repository, IValidator<SystemTask> validator, 
             IUserIdentityProvider identityProvider) 
         : base(repository, validator, identityProvider)
     {

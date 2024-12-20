@@ -1,5 +1,6 @@
 ﻿using ARM.Core.Models.Entities.Intf;
 using ARM.Core.Models.UI;
+using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace ARM.DAL.Repositories;
 /// </summary>
 /// <typeparam name="T">Базовый тип</typeparam>
 /// <typeparam name="U">Тип в БД</typeparam>
-public abstract class BaseDbActualEntitiesRepository<T, U> : BaseDbEntitiesRepository<T, U>
+public abstract class BaseDbActualEntitiesRepository<T, U> : BaseDbEntitiesRepository<T, U>, IDbActualEntitiesRepository<T>
     where T : class, IActualEntity
     where U : class, IActualEntity
 {
@@ -30,23 +31,21 @@ public abstract class BaseDbActualEntitiesRepository<T, U> : BaseDbEntitiesRepos
         _logger = logger;
     }
 
-    public override async Task<Result<T>> Remove(T entity)
+    public virtual async Task<Result<object>> Remove(Guid id, Guid userId)
     {
         try
         {
-            entity.IsActual = false;
-
-            await _context.Set<U>().Where(x => x.Id == entity.Id)
+            await _context.Set<U>().Where(x => x.Id == id)
                 .ExecuteUpdateAsync(x => x.SetProperty(p => p.IsActual, _ => false)
-                    .SetProperty(p => p.DeleteDate, e => e.DeleteDate)
-                    .SetProperty(p => p.DeletedUserId, e => e.DeletedUserId));
+                    .SetProperty(p => p.DeleteDate, _ => DateTime.Now)
+                    .SetProperty(p => p.DeletedUserId, _ => userId));
 
-            return new Result<T>(true, entity);
+            return new Result<object>(true, null);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<T>("Произошла ошибка при удалении сущности");
+            return new Result<object>("Произошла ошибка при удалении сущности");
         }
     }
     

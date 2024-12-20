@@ -155,7 +155,7 @@
       'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
     };
 
-    await axios.post('/api/Cabinets/Update', cabinet,
+    await axios.put('/api/Cabinets/Update', cabinet,
       {
         headers: headers
       })
@@ -175,7 +175,7 @@
       'Authorization': 'Bearer ' + sessionStorage.getItem('AccessToken')
     };
 
-    await axios.post('/api/Cabinets/Delete', cabinet,
+    await axios.delete('/api/Cabinets/Delete?id=' + cabinetId.value,
       {
         headers: headers
       })

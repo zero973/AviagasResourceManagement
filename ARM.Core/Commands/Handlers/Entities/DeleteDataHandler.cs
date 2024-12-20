@@ -21,7 +21,8 @@ public class DeleteDataHandler<T> : IRequestHandler<DeleteDataRequest<T>, Result
 
     public virtual async Task<Result<T>> Handle(DeleteDataRequest<T> request, CancellationToken cancellationToken)
     {
-        return await _repository.Remove(request.Entity);
+        var result = await _repository.Remove(request.Id);
+        return new Result<T>(result.IsSuccess, null, result.Message);
     }
 
 }

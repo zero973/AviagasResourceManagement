@@ -13,11 +13,11 @@ public class AddActualDataHandler<T> : IRequestHandler<AddActualDataRequest<T>, 
     where T : class, IActualEntity
 {
 
-    protected readonly IDbEntitiesRepository<T> _repository;
+    protected readonly IDbActualEntitiesRepository<T> _repository;
     protected readonly IValidator<T> _validator;
     protected readonly IUserIdentityProvider _identityProvider;
 
-    public AddActualDataHandler(IDbEntitiesRepository<T> repository, IValidator<T> validator, 
+    public AddActualDataHandler(IDbActualEntitiesRepository<T> repository, IValidator<T> validator, 
         IUserIdentityProvider identityProvider)
     {
         _repository = repository;

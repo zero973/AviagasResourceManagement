@@ -34,11 +34,11 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// Меняет текущего исполнителя задачи
     /// </summary>
     /// <returns>Возращает изменённый объект типа <see cref="SystemTask"/></returns>
-    [HttpPost]
+    [HttpPut]
     [Route("[action]")]
     public async Task<JsonResult> ChangeTaskPerformer([FromBody] ChangeTaskPerformer data)
     {
-        return new JsonResult(await _sender.Send(new ChangeTaskPerformer(data.TaskId, data.EmployeeId)));
+        return new JsonResult(await _sender.Send(data));
     }
     
     /// <summary>
@@ -58,11 +58,11 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// </summary>
     /// <remarks>Удаляет сотрудника из списка <see cref="SystemTask.Employees"/>.</remarks>
     /// <returns>Возращает удалённый объект типа <see cref="TaskEmployee"/></returns>
-    [HttpPost]
+    [HttpDelete]
     [Route("[action]")]
-    public async Task<JsonResult> RemoveLinkedEmployee([FromBody] TaskEmployee employee)
+    public async Task<JsonResult> RemoveLinkedEmployee([FromBody] Guid employeeId)
     {
-        return new JsonResult(await _sender.Send(new DeleteDataRequest<TaskEmployee>(employee)));
+        return new JsonResult(await _sender.Send(new DeleteDataRequest<TaskEmployee>(employeeId)));
     }
     
     /// <summary>

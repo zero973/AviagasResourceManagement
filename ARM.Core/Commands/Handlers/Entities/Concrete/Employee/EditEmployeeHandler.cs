@@ -12,7 +12,7 @@ namespace ARM.Core.Commands.Handlers.Entities.Concrete.Employee;
 public class EditEmployeeHandler : EditActualDataHandler<EmployeeAccount>
 {
     
-    public EditEmployeeHandler(IDbEntitiesRepository<EmployeeAccount> repository, IValidator<EmployeeAccount> validator, 
+    public EditEmployeeHandler(IDbActualEntitiesRepository<EmployeeAccount> repository, IValidator<EmployeeAccount> validator, 
         IUserIdentityProvider authService) : base(repository, validator, authService)
     {
         

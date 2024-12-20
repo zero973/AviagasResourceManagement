@@ -14,17 +14,18 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
 {
 
     private readonly IDbEntitiesRepository<TaskEmployee> _taskEmployeesRepository;
-    private readonly IDbEntitiesRepository<WorkedTime> _workedHoursRepository;
-    private readonly IDbEntitiesRepository<Comment> _commentsRepository;
+    private readonly IDbActualEntitiesRepository<WorkedTime> _workedHoursRepository;
+    private readonly IDbActualEntitiesRepository<Comment> _commentsRepository;
     private readonly IDbEntitiesRepository<CabinetPartCounts> _cabinetPartCountsRepository;
-    private readonly IDbEntitiesRepository<EmployeeAccount> _employeesRepository;
+    private readonly IDbActualEntitiesRepository<EmployeeAccount> _employeesRepository;
     private readonly IDbEntitiesRepository<CabinetPart> _cabinetPartsRepository;
     
     public SystemTasksRepository(AppDbContext context, IMapper mapper, ILogger<SystemTasksRepository> logger, 
-            IDbEntitiesRepository<WorkedTime> workedHoursRepository, IDbEntitiesRepository<Comment> commentsRepository, 
+            IDbActualEntitiesRepository<WorkedTime> workedHoursRepository, 
+            IDbActualEntitiesRepository<Comment> commentsRepository, 
             IDbEntitiesRepository<TaskEmployee> taskEmployeesRepository, 
             IDbEntitiesRepository<CabinetPartCounts> cabinetPartCountsRepository, 
-            IDbEntitiesRepository<EmployeeAccount> employeesRepository, 
+            IDbActualEntitiesRepository<EmployeeAccount> employeesRepository, 
             IDbEntitiesRepository<CabinetPart> cabinetPartsRepository)
         : base(context, mapper, logger)
     {

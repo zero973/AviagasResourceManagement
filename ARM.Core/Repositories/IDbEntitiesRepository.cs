@@ -39,7 +39,7 @@ public interface IDbEntitiesRepository<T> where T : class, IEntity
     /// <summary>
     /// Удалить сущность
     /// </summary>
-    Task<Result<T>> Remove(T entity);
+    Task<Result<object>> Remove(Guid Id);
 
     /// <summary>
     /// Удалить диапазон сущностей

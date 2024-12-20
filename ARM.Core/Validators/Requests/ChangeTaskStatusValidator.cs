@@ -7,7 +7,7 @@ namespace ARM.Core.Validators.Requests;
 
 public class ChangeTaskStatusValidator : AbstractValidator<ChangeTaskStatus>
 {
-    public ChangeTaskStatusValidator(IDbEntitiesRepository<SystemTask> repository)
+    public ChangeTaskStatusValidator(IDbActualEntitiesRepository<SystemTask> repository)
     {
         ClassLevelCascadeMode = CascadeMode.Stop;
         
