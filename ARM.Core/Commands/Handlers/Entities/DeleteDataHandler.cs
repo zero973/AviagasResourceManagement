@@ -3,12 +3,13 @@ using ARM.Core.Identity.Providers;
 using ARM.Core.Models.Entities.Intf;
 using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
+using FluentResults;
 using FluentValidation;
 using MediatR;
 
 namespace ARM.Core.Commands.Handlers.Entities;
 
-public class DeleteDataHandler<T> : IRequestHandler<DeleteDataRequest<T>, Result<T>>
+public class DeleteDataHandler<T> : IRequestHandler<DeleteDataRequest<T>, Result>
     where T : class, IEntity
 {
     
@@ -19,10 +20,9 @@ public class DeleteDataHandler<T> : IRequestHandler<DeleteDataRequest<T>, Result
         _repository = repository;
     }
 
-    public virtual async Task<Result<T>> Handle(DeleteDataRequest<T> request, CancellationToken cancellationToken)
+    public virtual async Task<Result> Handle(DeleteDataRequest<T> request, CancellationToken cancellationToken)
     {
-        var result = await _repository.Remove(request.Id);
-        return new Result<T>(result.IsSuccess, null, result.Message);
+        return await _repository.Remove(request.Id);
     }
 
 }

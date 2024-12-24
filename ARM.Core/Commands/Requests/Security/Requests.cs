@@ -1,6 +1,6 @@
-﻿using ARM.Core.Models.Entities;
-using ARM.Core.Models.Security;
+﻿using ARM.Core.Models.Security;
 using ARM.Core.Models.UI;
+using FluentResults;
 using MediatR;
 
 namespace ARM.Core.Commands.Requests.Security;

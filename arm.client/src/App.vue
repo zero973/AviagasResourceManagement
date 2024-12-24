@@ -69,9 +69,9 @@
 
     await axios.post('/api/Authorization/LogIn', credentials)
       .then(x => {
-        responseAnswerOnAuth.value = x.data.data;
-        sessionStorage.setItem('AccessToken', x.data.data.accessToken);
-        sessionStorage.setItem('RefreshToken', x.data.data.refreshToken);
+        responseAnswerOnAuth.value = x.data;
+        sessionStorage.setItem('AccessToken', responseAnswerOnAuth.value.accessToken);
+        sessionStorage.setItem('RefreshToken', responseAnswerOnAuth.value.refreshToken);
       })
       .catch(x => console.error(x));
 

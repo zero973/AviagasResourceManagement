@@ -2,6 +2,7 @@
 using ARM.Core.Models.Entities;
 using ARM.Core.Models.Statistics;
 using ARM.Core.Models.UI;
+using FluentResults;
 using MediatR;
 
 namespace ARM.Core.Commands.Requests.Entities.Concrete;

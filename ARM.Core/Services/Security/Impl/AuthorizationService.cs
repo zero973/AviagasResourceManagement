@@ -4,6 +4,7 @@ using ARM.Core.Models.Entities;
 using ARM.Core.Models.Security;
 using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
+using FluentResults;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
 
@@ -36,20 +37,19 @@ public class AuthorizationService : IAuthorizationService
         var userResult = await _authorizationRepository.GetUserByLoginAndPassword(credentials.Login, passwordHash);
 
         if (!userResult.IsSuccess)
-            return new Result<TokensPair>("Пользователь с таким логином и паролем не найден");
+            return Result.Fail<TokensPair>("Пользователь с таким логином и паролем не найден");
         
-        var user = userResult.Data;
+        var user = userResult.Value!;
 
         await _refreshTokensRepository.RevokeTokenIfExists(user.Id, deviceId);
 
         var token = await _jwtService.GenerateTokenForUser(user, deviceId);
-        return new Result<TokensPair>(true, token);
+        return Result.Ok(token);
     }
 
     public async Task<Result<TokensPair>> SignUp(SignUpCredentials credentials, string deviceId)
     {
-        throw new NotImplementedException();
-        
+        // регистрация в приложении не предусмотрена
         var newUser = new EmployeeAccount()
         {
             Login = credentials.Login,
@@ -57,7 +57,7 @@ public class AuthorizationService : IAuthorizationService
         };
 
         var token = await _jwtService.GenerateTokenForUser(newUser, deviceId);
-        return new Result<TokensPair>(true, token);
+        return Result.Ok(token);
     }
 
     public async Task<Result<TokensPair>> Refresh(TokensPair pair, string deviceId)
@@ -67,23 +67,30 @@ public class AuthorizationService : IAuthorizationService
 
         var userResult = await _sender.Send(new GetActualDataRequest<EmployeeAccount>(userId));
 
-        if (!userResult.IsSuccess)
-            return new Result<TokensPair>(userResult.Message);
+        if (userResult.IsFailed)
+            return Result.Fail<TokensPair>(userResult.Errors);
 
-        var storedRefreshToken = (await _refreshTokensRepository.GetToken(pair.RefreshToken))!;
+        var storedRefreshTokenResult = await _refreshTokensRepository.GetToken(pair.RefreshToken);
+        if (storedRefreshTokenResult.IsFailed)
+        {
+            return Result.Fail<TokensPair>(storedRefreshTokenResult.Errors);
+        }
+        
+        var storedRefreshToken = storedRefreshTokenResult.Value;
+        
         if (storedRefreshToken.IsRevoked)
-            return new Result<TokensPair>("Токен отозван");
+            return Result.Fail<TokensPair>("Токен отозван");
 
         if (storedRefreshToken.IsUsed)
         {
             await _refreshTokensRepository.RevokeTokenIfExists(userId, deviceId);
-            return new Result<TokensPair>("Токен уже использован");
+            return Result.Fail<TokensPair>("Токен уже использован");
         }
 
         await _refreshTokensRepository.UseToken(pair.RefreshToken);
-        var token = await _jwtService.GenerateTokenForUser(userResult.Data, deviceId);
+        var token = await _jwtService.GenerateTokenForUser(userResult.Value, deviceId);
         
-        return new Result<TokensPair>(true, token);
+        return Result.Ok(token);
     }
     
 }

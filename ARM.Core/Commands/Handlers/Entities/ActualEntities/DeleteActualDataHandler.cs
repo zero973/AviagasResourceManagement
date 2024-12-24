@@ -1,13 +1,13 @@
 ﻿using ARM.Core.Commands.Requests.Entities.ActualEntities;
 using ARM.Core.Identity.Providers;
 using ARM.Core.Models.Entities.Intf;
-using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
+using FluentResults;
 using MediatR;
 
 namespace ARM.Core.Commands.Handlers.Entities.ActualEntities;
 
-public class DeleteActualDataHandler<T> : IRequestHandler<DeleteActualDataRequest<T>, Result<T>>
+public class DeleteActualDataHandler<T> : IRequestHandler<DeleteActualDataRequest<T>, Result>
     where T : class, IActualEntity
 {
     
@@ -20,10 +20,9 @@ public class DeleteActualDataHandler<T> : IRequestHandler<DeleteActualDataReques
         _authService = authService;
     }
 
-    public virtual async Task<Result<T>> Handle(DeleteActualDataRequest<T> request, CancellationToken cancellationToken)
+    public virtual async Task<Result> Handle(DeleteActualDataRequest<T> request, CancellationToken cancellationToken)
     {
-        var result = await _repository.Remove(request.Id, _authService.GetCurrentUserIdentity().UserId);
-        return new Result<T>(result.IsSuccess, null, result.Message);
+        return await _repository.Remove(request.Id, _authService.GetCurrentUserIdentity().UserId);
     }
 
 }

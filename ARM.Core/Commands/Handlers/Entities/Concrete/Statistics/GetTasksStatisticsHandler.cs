@@ -1,8 +1,10 @@
 ﻿using ARM.Core.Commands.Requests.Entities.Concrete;
 using ARM.Core.Extensions;
+using ARM.Core.Helpers;
 using ARM.Core.Models.Statistics;
-using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
+using FluentResults;
+using FluentValidation;
 using MediatR;
 
 namespace ARM.Core.Commands.Handlers.Entities.Concrete.Statistics;
@@ -11,18 +13,20 @@ public class GetTasksStatisticsHandler : IRequestHandler<GetTasksStatistics, Res
 {
 
     private readonly IStatisticsRepository _repository;
+    private readonly IValidator<GetTasksStatistics> _validator;
 
-    public GetTasksStatisticsHandler(IStatisticsRepository repository)
+    public GetTasksStatisticsHandler(IStatisticsRepository repository, IValidator<GetTasksStatistics> validator)
     {
         _repository = repository;
+        _validator = validator;
     }
     
     public async Task<Result<List<TasksStatistics>>> Handle(GetTasksStatistics request, CancellationToken cancellationToken)
     {
-        if (request.Month > DateTime.Now.WithLastDayMonth())
-        {
-            return new Result<List<TasksStatistics>>("Месяц не должен превышать текущую дату");
-        }
+        var validationResult = await CommandHandlersHelper.Validate(request, _validator);
+        if (validationResult.IsFailed)
+            return Result.Fail<List<TasksStatistics>>(validationResult.Errors);
+        
         return await _repository.GetTasksStatisticsForMonth(request.Month);
     }
     

@@ -1,8 +1,8 @@
 ﻿using ARM.Core.Commands.Requests.Entities.Concrete;
 using ARM.Core.Helpers;
 using ARM.Core.Models.Entities;
-using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
+using FluentResults;
 using FluentValidation;
 using MediatR;
 
@@ -27,10 +27,10 @@ public class ChangeTaskPerformerHandler : IRequestHandler<ChangeTaskPerformer, R
     public async Task<Result<SystemTask>> Handle(ChangeTaskPerformer request, CancellationToken cancellationToken)
     {
         var validationResult = await CommandHandlersHelper.Validate(request, _validator);
-        if (!validationResult.IsSuccess)
-            return new Result<SystemTask>(false, null, validationResult.Message);
+        if (validationResult.IsFailed)
+            return Result.Fail<SystemTask>(validationResult.Errors);
 
-        var task = (await _repository.Get(request.TaskId)).Data;
+        var task = (await _repository.Get(request.TaskId)).Value;
         task.CurrentPerformerId = request.EmployeeId;
         
         return await _repository.Update(task);

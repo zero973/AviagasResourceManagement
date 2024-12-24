@@ -1,7 +1,7 @@
 ﻿using ARM.Core.Commands.Requests.Entities.Concrete;
 using ARM.Core.Models.Statistics;
-using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
+using FluentResults;
 using MediatR;
 
 namespace ARM.Core.Commands.Handlers.Entities.Concrete.Statistics;

@@ -1,7 +1,9 @@
 ﻿using ARM.Core.Commands.Requests.Entities;
 using ARM.Core.Commands.Requests.Entities.Concrete;
 using ARM.Core.Models.Entities;
+using ARM.Core.Models.Statistics;
 using ARM.WebApi.Controllers.Entities.Base;
+using FluentResults.Extensions.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,9 +27,9 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// <returns>Возращает изменённый объект типа <see cref="SystemTask"/></returns>
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> ChangeTaskStatus([FromBody] ChangeTaskStatus data)
+    public async Task<ActionResult<SystemTask>> ChangeTaskStatus([FromBody] ChangeTaskStatus data)
     {
-        return new JsonResult(await _sender.Send(new ChangeTaskStatus(data.TaskId, data.NewStatus)));
+        return await _sender.Send(new ChangeTaskStatus(data.TaskId, data.NewStatus)).ToActionResult();
     }
     
     /// <summary>
@@ -36,9 +38,9 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// <returns>Возращает изменённый объект типа <see cref="SystemTask"/></returns>
     [HttpPut]
     [Route("[action]")]
-    public async Task<JsonResult> ChangeTaskPerformer([FromBody] ChangeTaskPerformer data)
+    public async Task<ActionResult<SystemTask>> ChangeTaskPerformer([FromBody] ChangeTaskPerformer data)
     {
-        return new JsonResult(await _sender.Send(data));
+        return await _sender.Send(data).ToActionResult();
     }
     
     /// <summary>
@@ -48,9 +50,9 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// <returns>Возращает добавленный объект типа <see cref="TaskEmployee"/></returns>
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> AddLinkedEmployee([FromBody] TaskEmployee employee)
+    public async Task<ActionResult<TaskEmployee>> AddLinkedEmployee([FromBody] TaskEmployee employee)
     {
-        return new JsonResult(await _sender.Send(new AddDataRequest<TaskEmployee>(employee)));
+        return await _sender.Send(new AddDataRequest<TaskEmployee>(employee)).ToActionResult();
     }
     
     /// <summary>
@@ -60,9 +62,9 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// <returns>Возращает удалённый объект типа <see cref="TaskEmployee"/></returns>
     [HttpDelete]
     [Route("[action]")]
-    public async Task<JsonResult> RemoveLinkedEmployee([FromBody] Guid employeeId)
+    public async Task<ActionResult<TaskEmployee>> RemoveLinkedEmployee([FromBody] Guid employeeId)
     {
-        return new JsonResult(await _sender.Send(new DeleteDataRequest<TaskEmployee>(employeeId)));
+        return await _sender.Send(new DeleteDataRequest<TaskEmployee>(employeeId)).ToActionResult();
     }
     
     /// <summary>
@@ -72,9 +74,9 @@ public class SystemTasksController : BaseActualEntityController<SystemTask>
     /// <returns></returns>
     [HttpGet]
     [Route("[action]")]
-    public async Task<JsonResult> GetTasksStatistics([FromQuery] DateTime month)
+    public async Task<ActionResult<List<TasksStatistics>>> GetTasksStatistics([FromQuery] DateTime month)
     {
-        return new JsonResult(await _sender.Send(new GetTasksStatistics(month)));
+        return await _sender.Send(new GetTasksStatistics(month)).ToActionResult();
     }
     
 }

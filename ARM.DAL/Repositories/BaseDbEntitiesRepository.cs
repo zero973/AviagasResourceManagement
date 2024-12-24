@@ -5,6 +5,7 @@ using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using AutoMapper;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -38,12 +39,12 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
         try
         {
             var result = await _context.Set<U>().FindAsync(id);
-            return new Result<T>(true, _mapper.Map<T>(result));
+            return Result.Ok(_mapper.Map<T>(result));
         }
         catch (Exception ex) 
         {
             _logger.LogError(ex, "Ошибка при получении объекта по Id");
-            return new Result<T>("Произошла ошибка при попытке получить объект по Id");
+            return Result.Fail<T>("Произошла ошибка при попытке получить объект по Id");
         }
     }
 
@@ -60,17 +61,17 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при применении фильтров, сортировки и пагинации");
-            return new Result<List<T>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
+            return Result.Fail<List<T>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
         }
 
         try
         {
-            return new Result<List<T>>(true, await _mapper.ProjectTo<T>(result).ToListAsync());
+            return Result.Ok(await _mapper.ProjectTo<T>(result).ToListAsync());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при загрузке данных");
-            return new Result<List<T>>("Произошла ошибка при загрузке данных");
+            return Result.Fail<List<T>>("Произошла ошибка при загрузке данных");
         }
     }
 
@@ -83,12 +84,12 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
             var savedEntity = await _context.Set<U>().AddAsync(entityForSave);
 
             await SaveChanges();
-            return new Result<T>(true, _mapper.Map<T>(savedEntity.Entity));
+            return Result.Ok(_mapper.Map<T>(savedEntity.Entity));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при добавлении сущности");
-            return new Result<T>("Произошла ошибка при добавлении сущности");
+            return Result.Fail<T>("Произошла ошибка при добавлении сущности");
         }
     }
 
@@ -116,12 +117,12 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
             _context.Set<U>().Update(entityForSave);
 
             await SaveChanges();
-            return new Result<T>(true, _mapper.Map<T>(entityForSave));
+            return Result.Ok(_mapper.Map<T>(entityForSave));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при изменении сущности");
-            return new Result<T>("Произошла ошибка при изменении сущности");
+            return Result.Fail<T>("Произошла ошибка при изменении сущности");
         }
     }
 
@@ -133,7 +134,7 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
         await SaveChanges();
     }
 
-    public virtual async Task<Result<object>> Remove(Guid id)
+    public virtual async Task<Result> Remove(Guid id)
     {
         try
         {
@@ -141,12 +142,12 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
             _context.Set<U>().Remove(entity!);
 
             await SaveChanges();
-            return new Result<object>(true, "");
+            return Result.Ok();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<object>("Произошла ошибка при удалении сущности");
+            return Result.Fail("Произошла ошибка при удалении сущности");
         }
     }
 

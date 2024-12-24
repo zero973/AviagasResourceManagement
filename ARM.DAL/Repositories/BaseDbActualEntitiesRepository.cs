@@ -1,8 +1,8 @@
 ﻿using ARM.Core.Models.Entities.Intf;
-using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using AutoMapper;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +31,7 @@ public abstract class BaseDbActualEntitiesRepository<T, U> : BaseDbEntitiesRepos
         _logger = logger;
     }
 
-    public virtual async Task<Result<object>> Remove(Guid id, Guid userId)
+    public virtual async Task<Result> Remove(Guid id, Guid userId)
     {
         try
         {
@@ -40,12 +40,12 @@ public abstract class BaseDbActualEntitiesRepository<T, U> : BaseDbEntitiesRepos
                     .SetProperty(p => p.DeleteDate, _ => DateTime.Now)
                     .SetProperty(p => p.DeletedUserId, _ => userId));
 
-            return new Result<object>(true, null);
+            return Result.Ok();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<object>("Произошла ошибка при удалении сущности");
+            return Result.Fail("Произошла ошибка при удалении сущности");
         }
     }
     

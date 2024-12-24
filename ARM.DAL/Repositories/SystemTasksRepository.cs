@@ -5,6 +5,7 @@ using ARM.Core.Models.UI;
 using ARM.Core.Repositories;
 using AutoMapper;
 using ARM.DAL.ApplicationContexts;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -51,7 +52,7 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
                 .WithPagination()
                 .WithFilter(nameof(Models.Entities.TaskEmployee.TaskId), ComplexFilterOperators.Equals, id);
             
-            var employeesIds = (await _taskEmployeesRepository.GetAll(taskIdFilter)).Data
+            var employeesIds = (await _taskEmployeesRepository.GetAll(taskIdFilter)).Value
                 .Select(x => (object)x.EmployeeId)
                 .ToArray();
             
@@ -59,15 +60,15 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
                 .WithActualPagination()
                 .WithFilter(nameof(Models.Entities.Employee.Id), ComplexFilterOperators.In, employeesIds);
             
-            var employees = (await _employeesRepository.GetAll(prms)).Data;
+            var employees = (await _employeesRepository.GetAll(prms)).Value;
 
             taskIdFilter = taskIdFilter.WithActualPagination();
             
-            var workedHours = (await _workedHoursRepository.GetAll(taskIdFilter)).Data.Sum(x => x.Hours);
+            var workedHours = (await _workedHoursRepository.GetAll(taskIdFilter)).Value.Sum(x => x.Hours);
             
-            var comments = (await _commentsRepository.GetAll(taskIdFilter)).Data;
+            var comments = (await _commentsRepository.GetAll(taskIdFilter)).Value;
             
-            var cabinetPartCountsIds = (await _cabinetPartCountsRepository.GetAll(taskIdFilter)).Data
+            var cabinetPartCountsIds = (await _cabinetPartCountsRepository.GetAll(taskIdFilter)).Value
                 .ToDictionary(x => x.CabinetPartId, x => x);
             
             prms = new BaseListParams()
@@ -75,7 +76,7 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
                 .WithFilter(nameof(Models.Entities.CabinetPart.Id), ComplexFilterOperators.In, 
                     cabinetPartCountsIds.Select(x => (object)x.Key).ToArray());
             
-            var cabinetPartCounts = (await _cabinetPartsRepository.GetAll(prms)).Data
+            var cabinetPartCounts = (await _cabinetPartsRepository.GetAll(prms)).Value
                 .Select(x => new CabinetPartCounts()
                 {
                     Id = cabinetPartCountsIds[x.Id].Id,
@@ -90,12 +91,12 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
             result.Comments = comments;
             result.CabinetParts = cabinetPartCounts;
             
-            return new Result<SystemTask>(true, result);
+            return Result.Ok(result);
         }
         catch (Exception ex) 
         {
             _logger.LogError(ex, "Ошибка при получении объекта по Id");
-            return new Result<SystemTask>("Произошла ошибка при попытке получить объект по Id");
+            return Result.Fail<SystemTask>("Произошла ошибка при попытке получить объект по Id");
         }
     }
 
@@ -112,17 +113,17 @@ public class SystemTasksRepository : BaseDbActualEntitiesRepository<SystemTask, 
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при применении фильтров, сортировки и пагинации");
-            return new Result<List<SystemTask>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
+            return Result.Fail<List<SystemTask>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
         }
 
         try
         {
-            return new Result<List<SystemTask>>(true, await _mapper.ProjectTo<SystemTask>(result).ToListAsync());
+            return Result.Ok(await _mapper.ProjectTo<SystemTask>(result).ToListAsync());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при загрузке данных");
-            return new Result<List<SystemTask>>("Произошла ошибка при загрузке данных");
+            return Result.Fail<List<SystemTask>>("Произошла ошибка при загрузке данных");
         }
     }
     

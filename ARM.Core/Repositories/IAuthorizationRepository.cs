@@ -1,5 +1,5 @@
 ﻿using ARM.Core.Models.Entities;
-using ARM.Core.Models.UI;
+using FluentResults;
 
 namespace ARM.Core.Repositories;
 

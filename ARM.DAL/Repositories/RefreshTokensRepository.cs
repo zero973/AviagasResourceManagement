@@ -2,6 +2,7 @@
 using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using AutoMapper;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -24,7 +25,7 @@ public class RefreshTokensRepository : IRefreshTokensRepository
         _logger = logger;
     }
 
-    public async Task<Core.Models.Security.RefreshToken> GetToken(string token)
+    public async Task<Result<Core.Models.Security.RefreshToken>> GetToken(string token)
     {
         try
         {
@@ -34,8 +35,8 @@ public class RefreshTokensRepository : IRefreshTokensRepository
         }
         catch (Exception ex) 
         {
-            _logger.LogError(ex, "Ошибка при получении RefreshToken");
-            throw;
+            _logger.LogError(ex, "Ошибка при получении RefreshToken - токен не найден");
+            return Result.Fail<Core.Models.Security.RefreshToken>("Ошибка при получении RefreshToken - токен не найден");
         }
     }
 

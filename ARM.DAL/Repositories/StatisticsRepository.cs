@@ -5,9 +5,9 @@ using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using ARM.DAL.Models.Entities;
 using Dapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ARM.DAL.Extensions;
+using FluentResults;
 
 namespace ARM.DAL.Repositories;
 
@@ -82,12 +82,12 @@ public class StatisticsRepository : IStatisticsRepository
                 ORDER BY t.""{nameof(SystemTask.Status)}"", t.""{nameof(SystemTask.Name)}""";
             var result = (await connection.QueryAsync<TasksStatistics>(sql, new { start, end }, transaction))
                 .AsList();
-            return new Result<List<TasksStatistics>>(true, result);
+            return Result.Ok(result);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Ошибка при получении объекта по Id");
-            return new Result<List<TasksStatistics>>("Произошла ошибка при попытке сформировать статистику");
+            return Result.Fail<List<TasksStatistics>>("Произошла ошибка при попытке сформировать статистику");
         }
     }
     

@@ -1,5 +1,6 @@
 ﻿using ARM.Core.Models.Statistics;
 using ARM.Core.Models.UI;
+using FluentResults;
 
 namespace ARM.Core.Repositories;
 

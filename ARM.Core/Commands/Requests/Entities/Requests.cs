@@ -1,5 +1,6 @@
 ﻿using ARM.Core.Models.Entities.Intf;
 using ARM.Core.Models.UI;
+using FluentResults;
 using MediatR;
 
 namespace ARM.Core.Commands.Requests.Entities;
@@ -29,4 +30,4 @@ public record EditDataRequest<T>(T Entity) : IRequest<Result<T>> where T : class
 /// <summary>
 /// Команда на удаление данных в БД
 /// </summary>
-public record DeleteDataRequest<T>(Guid Id) : IRequest<Result<T>> where T : class, IEntity;
+public record DeleteDataRequest<T>(Guid Id) : IRequest<Result> where T : class, IEntity;

@@ -5,6 +5,7 @@ using ARM.Core.Repositories;
 using ARM.DAL.ApplicationContexts;
 using ARM.DAL.Models.Entities;
 using AutoMapper;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using EmployeeSalary = ARM.DAL.Models.Entities.EmployeeSalary;
@@ -31,14 +32,14 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
                 .FirstOrDefaultAsync(x => x.Login == login && x.PasswordHash == passwordHash);
 
             if (user == null)
-                return new Result<EmployeeAccount>("Не удалось найти пользователя с таким логином и паролем");
+                return Result.Fail("Не удалось найти пользователя с таким логином и паролем");
 
             return await Get(user.Id);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Ошибка при получении объекта по Id");
-            return new Result<EmployeeAccount>("Произошла ошибка при попытке получить объект по Id");
+            return Result.Fail<EmployeeAccount>("Произошла ошибка при попытке получить объект по Id");
         }
     }
 
@@ -66,12 +67,12 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
                     DeletedUserId = employee.DeletedUserId
                 };
             
-            return new Result<EmployeeAccount>(true, result);
+            return Result.Ok(result);
         }
         catch (Exception ex) 
         {
             _logger.LogError(ex, "Ошибка при получении объекта по Id");
-            return new Result<EmployeeAccount>("Произошла ошибка при попытке получить объект по Id");
+            return Result.Fail<EmployeeAccount>("Произошла ошибка при попытке получить объект по Id");
         }
     }
 
@@ -90,7 +91,7 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при применении фильтров, сортировки и пагинации");
-            return new Result<List<EmployeeAccount>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
+            return Result.Fail<List<EmployeeAccount>>("Произошла ошибка при применении фильтров, сортировки и пагинации");
         }
 
         try
@@ -108,12 +109,12 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
                     DeletedUserId = e.DeletedUserId
                 });
             
-            return new Result<List<EmployeeAccount>>(true, await result.ToListAsync());
+            return Result.Ok(await result.ToListAsync());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при загрузке данных");
-            return new Result<List<EmployeeAccount>>("Произошла ошибка при загрузке данных");
+            return Result.Fail<List<EmployeeAccount>>("Произошла ошибка при загрузке данных");
         }
     }
 
@@ -132,12 +133,12 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
             
             savedEntity.Entity.Salary = savedSalary;
             
-            return new Result<EmployeeAccount>(true, _mapper.Map<EmployeeAccount>(savedEntity.Entity));
+            return Result.Ok(_mapper.Map<EmployeeAccount>(savedEntity.Entity));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при добавлении сущности");
-            return new Result<EmployeeAccount>("Произошла ошибка при добавлении сущности");
+            return Result.Fail<EmployeeAccount>("Произошла ошибка при добавлении сущности");
         }
     }
 
@@ -165,16 +166,16 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
             
             entityForSave.Salary = curSalary;
             
-            return new Result<EmployeeAccount>(true, _mapper.Map<EmployeeAccount>(entityForSave));
+            return Result.Ok(_mapper.Map<EmployeeAccount>(entityForSave));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при изменении сущности");
-            return new Result<EmployeeAccount>("Произошла ошибка при изменении сущности");
+            return Result.Fail<EmployeeAccount>("Произошла ошибка при изменении сущности");
         }
     }
 
-    public override async Task<Result<object>> Remove(Guid id, Guid userId)
+    public override async Task<Result> Remove(Guid id, Guid userId)
     {
         try
         {
@@ -193,12 +194,12 @@ public class EmployeesRepository : BaseDbActualEntitiesRepository<EmployeeAccoun
 
             await DeleteSalary(curSalary, userId);
 
-            return new Result<object>(true, null);
+            return Result.Ok();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при удалении сущности");
-            return new Result<object>("Произошла ошибка при удалении сущности");
+            return Result.Fail("Произошла ошибка при удалении сущности");
         }
     }
 

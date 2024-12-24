@@ -1,5 +1,4 @@
-﻿using ARM.Core.Models.Entities.Intf;
-using ARM.Core.Models.UI;
+﻿using FluentResults;
 using FluentValidation;
 
 namespace ARM.Core.Helpers;
@@ -16,11 +15,9 @@ public static class CommandHandlersHelper
         var validationResult = await validator.ValidateAsync(entity);
         if (!validationResult.IsValid)
         {
-            var errors = validationResult.Errors.Select(x => x.ErrorMessage);
-            return new Result<T>($"Данные содержат следующие ошибки: \n" 
-                                 + string.Join($";\n", errors));
+            return Result.Fail<T>(validationResult.Errors.Select(x => x.ErrorMessage));
         }
-        return new Result<T>();
+        return Result.Ok(entity);
     }
 
 }

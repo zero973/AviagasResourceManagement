@@ -1,5 +1,5 @@
 ﻿using ARM.Core.Models.Entities.Intf;
-using ARM.Core.Models.UI;
+using FluentResults;
 
 namespace ARM.Core.Repositories;
 
@@ -12,6 +12,6 @@ public interface IDbActualEntitiesRepository<T> : IDbEntitiesRepository<T>
     /// </summary>
     /// <param name="Id">Id сущности</param>
     /// <param name="userId">Id пользователя, который удалил сущность</param>
-    Task<Result<object>> Remove(Guid id, Guid userId);
+    Task<Result> Remove(Guid id, Guid userId);
     
 }

@@ -1,6 +1,6 @@
-﻿using ARM.Core.Models.Entities;
-using ARM.Core.Models.Security;
+﻿using ARM.Core.Models.Security;
 using ARM.Core.Models.UI;
+using FluentResults;
 
 namespace ARM.Core.Services.Security;
 

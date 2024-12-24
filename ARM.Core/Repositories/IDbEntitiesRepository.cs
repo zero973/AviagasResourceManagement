@@ -1,5 +1,6 @@
 ﻿using ARM.Core.Models.Entities.Intf;
 using ARM.Core.Models.UI;
+using FluentResults;
 
 namespace ARM.Core.Repositories;
 
@@ -39,7 +40,7 @@ public interface IDbEntitiesRepository<T> where T : class, IEntity
     /// <summary>
     /// Удалить сущность
     /// </summary>
-    Task<Result<object>> Remove(Guid Id);
+    Task<Result> Remove(Guid Id);
 
     /// <summary>
     /// Удалить диапазон сущностей

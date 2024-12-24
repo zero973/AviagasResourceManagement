@@ -1,4 +1,5 @@
 ﻿using ARM.Core.Models.Security;
+using FluentResults;
 
 namespace ARM.Core.Repositories;
 
@@ -11,7 +12,7 @@ public interface IRefreshTokensRepository
     /// <summary>
     /// Получить токен
     /// </summary>
-    Task<RefreshToken> GetToken(string token);
+    Task<Result<RefreshToken>> GetToken(string token);
     
     /// <summary>
     /// Создать токен

@@ -1,6 +1,7 @@
 ﻿using ARM.Core.Commands.Requests.Entities;
 using ARM.Core.Models.Entities.Intf;
 using ARM.Core.Models.UI;
+using FluentResults.Extensions.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,37 +23,37 @@ public abstract class BaseEntityController<T> : ControllerBase
     
     [HttpGet]
     [Route("[action]")]
-    public virtual async Task<JsonResult> Get(Guid id)
+    public virtual async Task<ActionResult<T>> Get(Guid id)
     {
-        return new JsonResult(await _sender.Send(new GetDataRequest<T>(id)));
+        return await _sender.Send(new GetDataRequest<T>(id)).ToActionResult();
     }
 
     [HttpGet]
     [Route("[action]")]
-    public virtual async Task<JsonResult> GetAll([FromQuery] BaseListParams baseParams)
+    public virtual async Task<ActionResult<List<T>>> GetAll([FromQuery] BaseListParams baseParams)
     {
-        return new JsonResult(await _sender.Send(new GetAllDataRequest<T>(baseParams)));
+        return await _sender.Send(new GetAllDataRequest<T>(baseParams)).ToActionResult();
     }
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task<JsonResult> Add([FromBody] T entity)
+    public virtual async Task<ActionResult<T>> Add([FromBody] T entity)
     {
-        return new JsonResult(await _sender.Send(new AddDataRequest<T>(entity)));
+        return await _sender.Send(new AddDataRequest<T>(entity)).ToActionResult();
     }
 
     [HttpPut]
     [Route("[action]")]
-    public virtual async Task<JsonResult> Update([FromBody] T entity)
+    public virtual async Task<ActionResult<T>> Update([FromBody] T entity)
     {
-        return new JsonResult(await _sender.Send(new EditDataRequest<T>(entity)));
+        return await _sender.Send(new EditDataRequest<T>(entity)).ToActionResult();
     }
 
     [HttpDelete]
     [Route("[action]")]
-    public virtual async Task<JsonResult> Delete([FromQuery] Guid id)
+    public virtual async Task<ActionResult> Delete([FromQuery] Guid id)
     {
-        return new JsonResult(await _sender.Send(new DeleteDataRequest<T>(id)));
+        return await _sender.Send(new DeleteDataRequest<T>(id)).ToActionResult();
     }
     
 }

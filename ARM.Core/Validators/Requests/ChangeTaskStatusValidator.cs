@@ -22,7 +22,7 @@ public class ChangeTaskStatusValidator : AbstractValidator<ChangeTaskStatus>
         RuleFor(x => x)
             .MustAsync(async (field, token) =>
             {
-                var task = (await repository.Get(field.TaskId)).Data;
+                var task = (await repository.Get(field.TaskId)).Value;
                 return (int)task.Status > (int)field.NewStatus;
             })
             .WithMessage("Нельзя понизить статус задачи. Проверьте правильность устанавливаемого статуса.");

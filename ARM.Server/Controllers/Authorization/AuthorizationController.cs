@@ -2,6 +2,7 @@
 using ARM.Core.Identity.Providers;
 using ARM.Core.Models.Security;
 using ARM.Core.Models.UI;
+using FluentResults.Extensions.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,36 +27,32 @@ public class AuthorizationController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> LogIn([FromBody] LogInCredentials credentials)
+    public async Task<ActionResult<TokensPair>> LogIn([FromBody] LogInCredentials credentials)
     {
-        var result = await _sender.Send(new LogInRequest(credentials, Request.Headers.UserAgent!));
-        return new JsonResult(result);
+        return await _sender.Send(new LogInRequest(credentials, Request.Headers.UserAgent!)).ToActionResult();
     }
     
     [AllowAnonymous]
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> SignUp([FromBody] SignUpCredentials credentials)
+    public async Task<ActionResult<TokensPair>> SignUp([FromBody] SignUpCredentials credentials)
     {
-        var result = await _sender.Send(new SignUpRequest(credentials, Request.Headers.UserAgent!));
-        return new JsonResult(result);
+        return await _sender.Send(new SignUpRequest(credentials, Request.Headers.UserAgent!)).ToActionResult();
     }
-    
     
     [HttpPost]
     [Route("[action]")]
-    public async Task<JsonResult> Refresh([FromBody] TokensPair pair)
+    public async Task<ActionResult<TokensPair>> Refresh([FromBody] TokensPair pair)
     {
-        var result = await _sender.Send(new RefreshRequest(pair, Request.Headers.UserAgent!));
-        return new JsonResult(result);
+        return await _sender.Send(new RefreshRequest(pair, Request.Headers.UserAgent!)).ToActionResult();
     }
     
     [Authorize]
     [HttpPost]
     [Route("[action]")]
-    public JsonResult GetCurrentUserId()
+    public ActionResult<Guid> GetCurrentUserId()
     {
-        return new JsonResult(_userIdentityProvider.GetCurrentUserIdentity().UserId);
+        return _userIdentityProvider.GetCurrentUserIdentity().UserId;
     }
     
 }
