@@ -138,10 +138,10 @@ public abstract class BaseDbEntitiesRepository<T, U> : IDbEntitiesRepository<T>
     {
         try
         {
-            var entity = await _context.FindAsync<U>(id);
-            _context.Set<U>().Remove(entity!);
-
-            await SaveChanges();
+            await _context.Set<U>()
+                .Where(x => x.Id == id)
+                .ExecuteDeleteAsync();
+            
             return Result.Ok();
         }
         catch (Exception ex)

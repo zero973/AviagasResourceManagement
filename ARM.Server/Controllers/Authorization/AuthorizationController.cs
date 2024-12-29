@@ -40,6 +40,7 @@ public class AuthorizationController : ControllerBase
         return await _sender.Send(new SignUpRequest(credentials, Request.Headers.UserAgent!)).ToActionResult();
     }
     
+    [AllowAnonymous]
     [HttpPost]
     [Route("[action]")]
     public async Task<ActionResult<TokensPair>> Refresh([FromBody] TokensPair pair)
